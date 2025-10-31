@@ -74,25 +74,8 @@ APIs externas (Google Places / OSM)
 
 ## 🗂️ Estrutura do Projeto  
 
-OdontoPlay/
-├── backend/
-│ ├── main.py
-│ ├── models/
-│ ├── routes/
-│ ├── database.py
-│ └── requirements.txt
-├── frontend/
-│ ├── src/
-│ │ ├── components/
-│ │ │ ├── FaceGame.jsx
-│ │ │ ├── Questionnaire.jsx
-│ │ │ └── Profile.jsx
-│ │ ├── pages/
-│ │ └── App.js
-│ └── package.json
-├── docker-compose.yml
-├── README.md
-└── .env.example
+<img width="134" height="332" alt="image" src="https://github.com/user-attachments/assets/bfb18b20-ebf8-42a3-9f40-1c903c7f8879" />
+
 
 ---
 
