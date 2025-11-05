@@ -68,7 +68,8 @@ APIs externas (Google Places / OSM)
 ### 4️⃣ Questionário de Saúde Bucal  
 - Perguntas dinâmicas sobre sintomas e hábitos.  
 - Retorna **possíveis diagnósticos** com base em regras clínicas simples.  
-- Ao final, mostra **dentistas próximos** usando a localização do usuário.  
+- Ao final, mostra **dentistas próximos** usando a localização do usuário.
+- https://www.figma.com/design/QXaOIFaPvNi60YzZM3WBdk?node-id=176%3A7&type=design&fuid=1059621041559645209#877817134 
 
 ---
 
