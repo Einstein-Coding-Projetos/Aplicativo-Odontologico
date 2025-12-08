@@ -1,12 +1,25 @@
+/* =========================
+   Paletas (tokens de cor)
+   ========================= */
 :root {
+  /* seus tokens originais (mantidos para compat) */
   --aqua: #0ea5a8;
   --aqua-soft: #e0fbfc;
   --ink: #0f172a;
   --muted: #64748b;
   --card: #ffffff;
   --bg: #f5fcff;
+
+  /* paleta oficial do quiz */
+  --quiz-01: #5FA869; /* verde (primário)  */
+  --quiz-02: #2C76A3; /* azul              */
+  --quiz-03: #E9B463; /* âmbar             */
+  --quiz-04: #E15148; /* vermelho (erro)   */
 }
 
+/* =========================
+   Reset básico
+   ========================= */
 * {
   margin: 0;
   padding: 0;
@@ -19,6 +32,7 @@ body {
   min-height: 100vh;
 }
 
+/* container raiz do app */
 .app-container {
   display: flex;
   justify-content: center;
@@ -27,8 +41,9 @@ body {
   padding: 20px;
 }
 
+/* página/cartão simples (pode ser usado fora do login também) */
 .page {
-  background: white;
+  background: var(--card);
   padding: 32px;
   border-radius: 20px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
@@ -37,36 +52,142 @@ body {
   text-align: center;
 }
 
-h1, h2 {
-  margin-bottom: 16px;
-  color: var(--ink);
-}
+h1, h2 { margin-bottom: 16px; color: var(--ink); }
+p { color: var(--muted); margin-bottom: 12px; }
 
-p {
-  color: var(--muted);
-  margin-bottom: 12px;
-}
-
+/* =========================
+   Inputs e foco acessível
+   ========================= */
 input {
   width: 100%;
-  padding: 10px;
+  height: 46px;
+  padding: 0 12px;
   border-radius: 12px;
   border: 1px solid #d0e3e7;
   margin-bottom: 14px;
+  font-size: 16px;
 }
 
+.app-container input::placeholder { color: #9CA3AF; }
+
+/* Foco padrão: azul da paleta */
+.app-container input:focus {
+  outline: none;
+  border-color: var(--quiz-02) !important;
+  box-shadow: 0 0 0 3px rgba(44, 118, 163, 0.25);
+}
+
+/* Foco em erro: vermelho da paleta */
+.app-container input[aria-invalid="true"]:focus {
+  border-color: var(--quiz-04) !important;
+  box-shadow: 0 0 0 3px rgba(225, 81, 72, 0.25);
+}
+
+/* =========================
+   Botões (primário/secundário)
+   ========================= */
 button {
   width: 100%;
   padding: 12px;
   border-radius: 12px;
   border: none;
-  background: var(--aqua);
+  background: var(--aqua); /* default para usos genéricos */
   color: white;
   font-size: 16px;
   cursor: pointer;
   transition: 0.2s;
 }
 
-button:hover {
-  background: #0b8587;
+/* hover do button genérico (mantido do seu estilo) */
+button:hover { background: #0b8587; }
+
+/* classes específicas do login */
+.app-container .btn-primary {
+  background: var(--quiz-01);       /* verde */
+  transition: transform .06s ease, box-shadow .2s ease, filter .2s ease;
+}
+.app-container .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(95,168,105,0.28);
+  filter: brightness(1.02);
+}
+.app-container .btn-primary:disabled {
+  filter: grayscale(20%) brightness(0.95);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.app-container .btn-secondary {
+  color: var(--quiz-02);
+  background: rgba(44,118,163,0.10);
+  border: 1px solid var(--quiz-02);
+  transition: transform .06s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
+}
+.app-container .btn-secondary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(44,118,163,0.18);
+  background: rgba(44,118,163,0.14);
+}
+.app-container .btn-secondary:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+/* =========================
+   Login “radical”: card + topo ondulado + abas
+   ========================= */
+.login-card {
+  position: relative;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 18px 40px rgba(0,0,0,.10);
+  overflow: hidden;
+  width: 100%;
+  max-width: 500px;
+}
+
+.wave-header {
+  height: 120px;
+  background: linear-gradient(135deg, var(--quiz-02), var(--quiz-01));
+  position: relative;
+}
+.wave-header svg {
+  position: absolute;
+  left: 0; bottom: -1px;
+  width: 100%;
+  height: auto;
+}
+
+/* Abas */
+.tabbar {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px 0 16px;
+}
+.tabbtn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: #334155;
+  transition: background .2s ease, color .2s ease;
+}
+.tabbtn[aria-selected="true"] {
+  color: #0f172a;
+  background: rgba(44,118,163,.10);
+  outline: 2px solid rgba(44,118,163,.20);
+}
+.tabpanel { padding: 16px; }
+
+/* =========================
+   Mascote com animação suave
+   ========================= */
+.mascot-bounce { animation: float-tooth 3s ease-in-out infinite; transform-origin: center; }
+@keyframes float-tooth {
+  0%   { transform: translateY(0) rotate(0deg); }
+  50%  { transform: translateY(-4px) rotate(-1deg); }
+  100% { transform: translateY(0) rotate(0deg); }
 }
