@@ -1,7 +1,17 @@
+import { useNavigate } from "react-router-dom";
+
 export default function ModeSelectPage() {
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    localStorage.removeItem("odonto_session");
+    navigate("/login", { replace: true });
+  }
+
   return (
     <div>
-      <h1>O que você quer fazer hoje?</h1>
+      {/* ...seu conteúdo da Home... */}
+      <button onClick={handleLogout}>Sair</button>
     </div>
   );
 }
