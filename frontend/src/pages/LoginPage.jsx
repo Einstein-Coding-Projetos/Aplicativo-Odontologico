@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
  * - Acessibilidade: labels, aria-live, foco correto
  */
 
+const NEXT_ROUTE = "/home";
+
 // ===== CONFIG BÁSICA =====
 const SALT = "odontoplay_v1_salt"; // TODO: mover para env
 const STORAGE_KEYS = {
@@ -118,7 +120,7 @@ export default function LoginPage() {
     const s = getSession();
     if (s?.userId) {
       try {
-        navigate("/home");
+        navigate(NEXT_ROUTE);
       } catch {}
     }
   }, [navigate]);
@@ -163,7 +165,7 @@ export default function LoginPage() {
     const welcome = firstTime ? `Bem-vindo(a), ${niceName}, ao Jogo Odontológico!` : `Bem-vindo(a) de volta, ${niceName}!`;
     setSession({ userId, guest, at: new Date().toISOString(), welcome });
     try {
-      navigate("/home");
+      navigate(NEXT_ROUTE);
     } catch {}
   };
 
