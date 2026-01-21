@@ -1,63 +1,154 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+const STORAGE_KEYS = {
+  players: "odonto_players",
+  session: "odonto_session",
+};
+
+// Paleta oficial (hex direto, sem variáveis CSS)
+const COLORS = {
+  quiz01: "#5FA869", // verde
+  quiz02: "#2C76A3", // azul
+  quiz03: "#E9B463", // âmbar
+  quiz04: "#E15148", // vermelho
+  ink:    "#1d2230",
+  muted:  "#4b5563",
+  card:   "#ffffff",
+  line:   "#d1d5db",
+  shadow: "0 10px 30px rgba(0,0,0,0.08)",
+  bgGrad: "linear-gradient(180deg, #e0f7fb 0%, #ffffff 60%)",
+};
+
+function getSession() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.session)) || null; }
+  catch { return null; }
+}
+function getPlayers() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.players)) || {}; }
+  catch { return {}; }
+}
 
 export default function ModeSelectPage() {
   const navigate = useNavigate();
-  const [welcome, setWelcome] = React.useState("");
+  const [name, setName] = useState("");
+  const [welcome, setWelcome] = useState("");
 
-  React.useEffect(() => {
-    const raw = localStorage.getItem("odonto_session");
-    if (!raw) return;
-    const s = JSON.parse(raw);
-    if (s?.welcome) {
-      setWelcome(s.welcome);
-      // limpa a mensagem para não reaparecer
-      const { welcome, ...rest } = s;
-      localStorage.setItem("odonto_session", JSON.stringify(rest));
-    }
-  }, []);
+  useEffect(() => {
+    const s = getSession();
+    if (!s?.userId) { navigate("/login", { replace: true }); return; }
+    const players = getPlayers();
+    const player = players[s.userId];
+    const displayName = player?.name || (s.guest ? "Convidado(a)" : "Jogador(a)");
+    setName(displayName);
+    setWelcome(s.welcome || `Olá, ${displayName}!`);
+  }, [navigate]);
 
-  function handleLogout() {
-    localStorage.removeItem("odonto_session");
-    navigate("/login", { replace: true });
-  }
+  const goGame = () => navigate("/game");
+  const goQuiz = () => navigate("/quiz");
+  const logout = () => { localStorage.removeItem(STORAGE_KEYS.session); navigate("/login", { replace: true }); };
 
   return (
-    <div style={{ padding: 24 }}>
-      {welcome && (
-        <div
-          role="status"
-          aria-live="polite"
-          style={{
-            marginBottom: 16,
-            padding: "10px 12px",
-            borderRadius: 12,
-            background: "#E9F2F9",
-            border: "1px solid #2C76A3",
-            color: "#1d2230",
-            fontWeight: 600,
-          }}
-        >
-          {welcome}
+    <div style={styles.page}>
+      <div style={styles.card}>
+        <div aria-hidden style={styles.topBar} />
+        <header style={styles.header}>
+          <div aria-hidden style={styles.mascot}>🦷</div>
+          <h1 style={styles.title}>{welcome.replace("Olá", "Bem-vindo(a) de volta")}</h1>
+          <p style={styles.subtitle}>Escolha para onde deseja ir, {name.split(" ")[0]}.</p>
+        </header>
+
+        <div style={styles.grid}>
+          <button onClick={goGame} style={{ ...styles.choiceBtn, ...styles.primary }}>
+            <span>🎮 Jogar</span>
+            <span style={styles.hint}>Jogo dos germes</span>
+          </button>
+
+          <button onClick={goQuiz} style={{ ...styles.choiceBtn, ...styles.secondary }}>
+            <span>📝 Perguntas</span>
+            <span style={styles.hint}>Quiz de saúde bucal</span>
+          </button>
+
+          <button onClick={logout} style={{ ...styles.choiceBtn, ...styles.ghost }}>
+            <span>🚪 Sair</span>
+            <span style={styles.hint}>Encerrar sessão</span>
+          </button>
         </div>
-      )}
-
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1 style={{ margin: 0 }}>O que você quer fazer hoje?</h1>
-        <button
-          onClick={handleLogout}
-          aria-label="Sair e voltar ao login"
-          style={{
-            height: 40, padding: "0 14px", borderRadius: 12,
-            border: "1px solid #d1d5db", background: "white",
-            color: "#1d2230", fontWeight: 600, cursor: "pointer"
-          }}
-        >
-          Sair
-        </button>
       </div>
-
-      {/* resto da Home */}
     </div>
   );
 }
+
+const styles = {
+  page: {
+    minHeight: "100dvh",
+    display: "grid",
+    placeItems: "center",
+    background: COLORS.bgGrad,
+    padding: 16,
+  },
+  card: {
+    width: "100%",
+    maxWidth: 560,
+    background: COLORS.card,
+    borderRadius: 20,
+    boxShadow: COLORS.shadow,
+    padding: 24,
+    position: "relative",
+    overflow: "hidden",
+  },
+  topBar: {
+    height: 84,
+    width: "calc(100% + 48px)",
+    margin: "-24px -24px 12px",
+    background: `linear-gradient(135deg, ${COLORS.quiz02} 0%, ${COLORS.quiz01} 100%)`,
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+  },
+  header: { textAlign: "center", marginBottom: 18 },
+  mascot: { fontSize: 40, marginBottom: 6 },
+  title: { margin: 0, fontSize: 22, color: COLORS.ink, fontWeight: 800 },
+  subtitle: { margin: "6px 0 14px", color: COLORS.muted, fontSize: 14 },
+
+  grid: { display: "grid", gridTemplateColumns: "1fr", gap: 12 },
+
+  choiceBtn: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: 4,
+    width: "100%",
+    padding: "16px 14px",
+    borderRadius: 14,
+    border: `1px solid ${COLORS.line}`,
+    background: "#fff",
+    color: COLORS.ink,
+    fontSize: 18,
+    fontWeight: 800,
+    cursor: "pointer",
+    transition: "transform .06s ease, box-shadow .2s ease, filter .2s ease",
+  },
+  hint: { fontSize: 12, color: COLORS.muted, fontWeight: 500 },
+
+   primary: {
+    border: `1px solid ${COLORS.quiz01}`,
+    background: "rgba(95,168,105,0.10)", // verde bem leve
+    color: COLORS.quiz01,
+    fontWeight: 800,
+    boxShadow: `inset 4px 0 0 0 ${COLORS.quiz01}`, // faixa lateral
+  },
+  secondary: {
+    border: `1px solid ${COLORS.quiz02}`,
+    background: "rgba(44,118,163,0.06)",
+    color: COLORS.quiz02,
+    fontWeight: 800,
+    boxShadow: `inset 4px 0 0 0 ${COLORS.quiz02}`,
+  },
+  ghost: {
+    border: `1px solid ${COLORS.line}`,
+    background: "#fff",
+    color: COLORS.ink,
+    fontWeight: 600,
+    boxShadow: `inset 4px 0 0 0 ${COLORS.quiz04}`,
+  },
+};
