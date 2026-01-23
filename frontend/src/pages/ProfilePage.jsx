@@ -2,82 +2,64 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 /**
- * ProfilePage.jsx
- * - Lê sessão do login (odonto_session)
- * - Lê jogador salvo (odonto_players)
- * - Mostra pontos, badges e progresso
- * - Logout remove sessão
+ * ProfilePage.jsx (Versão Híbrida)
+ * - Visual: Mantém os estilos e Badges do seu projeto original.
+ * - Lógica: Busca os dados do Backend (localhost:3000) em vez do localStorage antigo.
  */
-
-const STORAGE_KEYS = {
-  players: "odonto_players",
-  session: "odonto_session",
-};
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-
   const [player, setPlayer] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // ===== Helpers =====
-  const getSession = () => {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEYS.session));
-    } catch {
-      return null;
-    }
-  };
-
-  const getPlayers = () => {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEYS.players)) || {};
-    } catch {
-      return {};
-    }
-  };
-
-  // ===== Proteção da rota + carregar dados =====
+  // ===== Conexão com o Backend =====
   useEffect(() => {
-    const session = getSession();
+    // 1. Pega o CPF que salvamos no Login (pelo novo sistema)
+    const cpf = localStorage.getItem('userCpf');
 
-    if (!session?.userId) {
+    if (!cpf) {
       navigate("/login");
       return;
     }
 
-    if (session.guest) {
-      setPlayer({
-        name: "Convidado(a)",
-        points: 0,
-        badges: [],
-        guest: true,
+    // 2. Busca os dados reais no servidor
+    fetch(`http://localhost:3000/api/users/${cpf}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          alert('Sessão expirada ou usuário não encontrado.');
+          handleLogout();
+        } else {
+          // Adaptação: O back envia 'coins', o front mostra como 'pontos'
+          setPlayer({
+            ...data,
+            name: data.nome,     // O back manda 'nome', o front usa 'name'
+            points: data.coins   // O back manda 'coins', o front usa 'points'
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("Erro ao conectar no servidor:", err);
+      })
+      .finally(() => {
+        setLoading(false);
       });
-      return;
-    }
-
-    const players = getPlayers();
-    const currentPlayer = players[session.userId];
-
-    if (!currentPlayer) {
-      navigate("/login");
-      return;
-    }
-
-    setPlayer(currentPlayer);
   }, [navigate]);
 
   // ===== Logout =====
   const handleLogout = () => {
-    localStorage.removeItem(STORAGE_KEYS.session);
+    // Limpa os dados do novo sistema de login
+    localStorage.removeItem('userCpf');
+    localStorage.removeItem('userName');
     navigate("/login");
   };
 
+  if (loading) return <div style={styles.page}><h3>Carregando perfil...</h3></div>;
   if (!player) return null;
 
-  // ===== Pontos =====
+  // ===== Lógica Visual (Mantida do seu código) =====
   const totalPoints = player.points || 0;
 
-  // ===== Badges infantis =====
   const allBadges = [
     { name: "Sorriso Iniciante 😁", min: 0 },
     { name: "Amigo da Escova 🪥", min: 50 },
@@ -90,7 +72,7 @@ export default function ProfilePage() {
     (badge) => totalPoints >= badge.min
   );
 
-  // ===== Render =====
+  // ===== Renderização (Mantida do seu código) =====
   return (
     <div style={styles.page}>
       <div style={styles.card}>
@@ -139,7 +121,7 @@ export default function ProfilePage() {
   );
 }
 
-// ===== Estilos =====
+// ===== Estilos (Mantidos IDÊNTICOS aos seus) =====
 const styles = {
   page: {
     minHeight: "100vh",
@@ -201,5 +183,3 @@ const styles = {
     marginBottom: 10,
   },
 };
-
-
