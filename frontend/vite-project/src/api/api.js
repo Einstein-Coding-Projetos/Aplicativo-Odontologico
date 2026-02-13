@@ -5,11 +5,20 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access"); // 👈 JWT access
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`; // 👈 JWT usa Bearer
+  const publicRoutes = [
+    "accounts/register/",
+    "accounts/login/",
+  ];
+
+  if (!publicRoutes.some(route => config.url.includes(route))) {
+    const token = localStorage.getItem("access");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
+
   return config;
 });
 
-export default api;
+export default api; // 👈 FALTAVA ISSO
+
