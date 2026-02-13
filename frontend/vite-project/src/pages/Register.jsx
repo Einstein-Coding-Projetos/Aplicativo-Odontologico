@@ -18,24 +18,34 @@ export default function Register() {
 
     try {
       await register(username, email, password);
-      alert("Conta criada!");
-      navigate("/");
+      alert("Conta criada com sucesso!");
+      navigate("/"); // volta para login
     } catch (error) {
       alert("Erro ao criar conta");
+      console.error(error);
     }
   }
 
   return (
-    <div>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "15px",
+        maxWidth: "400px",
+        margin: "50px auto"
+      }}
+    >
       <h1>Criar Conta</h1>
 
       <input
-        placeholder="Nome"
+        placeholder="Nome de usuário"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
       />
 
       <input
+        type="email"
         placeholder="E-mail"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
@@ -48,7 +58,9 @@ export default function Register() {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <button onClick={handleRegister}>Cadastrar</button>
+      <button onClick={handleRegister}>
+        Cadastrar
+      </button>
     </div>
   );
 }
