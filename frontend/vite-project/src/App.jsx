@@ -8,6 +8,7 @@ import Questionario from "./pages/Questionario";
 import Jogo from "./pages/Jogo";
 import Perfil from "./pages/Perfil";
 import Register from "./pages/Register";
+import Ranking from "./pages/Ranking";
 
 import PublicLayout from "./components/PublicLayout";
 import PrivateLayout from "./components/PrivateLayout";
@@ -30,6 +31,7 @@ function App() {
             <Route path="/questionario" element={<Questionario />} />
             <Route path="/jogo" element={<Jogo />} />
             <Route path="/perfil" element={<Perfil />} />
+            <Route path="/ranking" element={<Ranking />} />
           </Route>
         </Route>
 
@@ -39,4 +41,3 @@ function App() {
 }
 
 export default App;
-
