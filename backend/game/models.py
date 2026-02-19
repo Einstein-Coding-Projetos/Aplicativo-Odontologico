@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 class Crianca(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     nome = models.CharField(max_length=100)
@@ -22,7 +23,11 @@ class PerfilEducacional(models.Model):
 
 
 class PartidaJogo(models.Model):
-    crianca = models.ForeignKey(Crianca, on_delete=models.CASCADE)
+    crianca = models.ForeignKey(
+        Crianca,
+        on_delete=models.CASCADE,
+        related_name="partidas"
+    )
     pontos = models.IntegerField()
     criada_em = models.DateTimeField(auto_now_add=True)
 
@@ -39,10 +44,34 @@ class Badge(models.Model):
 
 
 class CriancaBadge(models.Model):
-    crianca = models.ForeignKey(Crianca, on_delete=models.CASCADE)
-    badge = models.ForeignKey(Badge, on_delete=models.CASCADE)
+    crianca = models.ForeignKey(
+        Crianca,
+        on_delete=models.CASCADE,
+        related_name="badges_conquistados"
+    )
+    badge = models.ForeignKey(
+        Badge,
+        on_delete=models.CASCADE,
+        related_name="conquistas"
+    )
     data = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        unique_together = ('crianca', 'badge')
+    def __str__(self):
+        return f"{self.crianca.nome} ganhou {self.badge.nome} em {self.data.strftime('%d/%m/%Y')}"
+    
+class Premio(models.Model):
+    nome = models.CharField(max_length=100)
+    descricao = models.TextField()
+    badge_requerida = models.ForeignKey(Badge, on_delete=models.CASCADE)
+    quantidade_necessaria = models.IntegerField()
 
+    def __str__(self):
+        return self.nome
+
+class ProgressoPremio(models.Model):
+    crianca = models.ForeignKey(Crianca, on_delete=models.CASCADE)
+    premio = models.ForeignKey(Premio, on_delete=models.CASCADE)
+    quantidade_atual = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.crianca.nome} - {self.premio.nome}: {self.quantidade_atual}"
