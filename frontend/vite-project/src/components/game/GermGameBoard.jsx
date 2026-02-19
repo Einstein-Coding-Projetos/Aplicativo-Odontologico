@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Germ from "./Germ";
 
 export default function GermGameBoard({
@@ -8,60 +8,65 @@ export default function GermGameBoard({
   onKill,
   spawnRate
 }) {
-  const [germes, setGermes] = useState([]);
+  const [germe, setGerme] = useState(null);
+  const timeoutRef = useRef(null);
 
   useEffect(() => {
     if (!jogoAtivo) return;
 
-    const interval = setInterval(() => {
-      if (mouthBox && mouthOpen) {
-        spawnGerme();
-      }
-    }, spawnRate);
+    // Se boca estiver aberta e NÃO houver germe ativo
+    if (mouthOpen && mouthBox && !germe) {
+      spawnGerme();
+    }
 
-    return () => clearInterval(interval);
-  }, [jogoAtivo, mouthBox, mouthOpen, spawnRate]);
+    // Se boca fechar, remove germe atual
+    if (!mouthOpen) {
+      limparGerme();
+    }
+
+    return () => clearTimeout(timeoutRef.current);
+  }, [mouthOpen, jogoAtivo, mouthBox, germe]);
 
   function spawnGerme() {
-  if (!mouthBox) return;
+    if (!mouthBox) return;
 
-  const tamanho = 30;
-  const videoWidth = 640;
+    const tamanho = 30;
+    const videoWidth = 640;
 
-  const largura = mouthBox.right - mouthBox.left;
-  const altura = mouthBox.bottom - mouthBox.top;
+    const largura = mouthBox.right - mouthBox.left;
+    const altura = mouthBox.bottom - mouthBox.top;
 
-  if (largura <= tamanho || altura <= tamanho) return;
+    if (largura <= tamanho || altura <= tamanho) return;
 
-  const x =
-    videoWidth -
-    (Math.random() * (largura - tamanho) +
-      mouthBox.left);
+    const x =
+      videoWidth -
+      (Math.random() * (largura - tamanho) + mouthBox.left);
 
-  const y =
-    Math.random() * (altura - tamanho) +
-    mouthBox.top;
+    const y =
+      Math.random() * (altura - tamanho) + mouthBox.top;
 
-  const novoGerme = {
-    id: Date.now() + Math.random(),
-    x,
-    y,
-  };
+    const novoGerme = {
+      id: Date.now(),
+      x,
+      y
+    };
 
-  setGermes((prev) => [...prev, novoGerme]);
+    setGerme(novoGerme);
 
-  setTimeout(() => {
-    setGermes((prev) =>
-      prev.filter((g) => g.id !== novoGerme.id)
-    );
-  }, 2000);
-}
+    // Tempo que ele fica visível
+    timeoutRef.current = setTimeout(() => {
+      setGerme(null);
+    }, spawnRate);
+  }
 
-  function matarGerme(id) {
-    setGermes((prev) =>
-      prev.filter((g) => g.id !== id)
-    );
+  function limparGerme() {
+    clearTimeout(timeoutRef.current);
+    setGerme(null);
+  }
+
+  function matarGerme() {
     if (onKill) onKill(10);
+    limparGerme();
   }
 
   return (
@@ -74,14 +79,12 @@ export default function GermGameBoard({
         zIndex: 10,
       }}
     >
-      {germes.map((germe) => (
+      {germe && (
         <Germ
-          key={germe.id}
           germe={germe}
-          onClick={() => matarGerme(germe.id)}
+          onClick={matarGerme}
         />
-      ))}
+      )}
     </div>
   );
-
 }

@@ -2,7 +2,7 @@ import WebcamView from "./WebcamView";
 import GermGameBoard from "./GermGameBoard.jsx";
 import useMouthDetection from "../../hooks/useMouthDetection";
 
-export default function GameContainer({ jogoAtivo, onKill }) {
+export default function GameContainer({ jogoAtivo, onKill, spawnRate }) {
   const { mouthOpen, mouthBox, detect } = useMouthDetection();
 
   return (
@@ -24,7 +24,7 @@ export default function GameContainer({ jogoAtivo, onKill }) {
           mouthBox={mouthBox}
           jogoAtivo={jogoAtivo}
           onKill={onKill}
-          spawnRate={800}
+          spawnRate={spawnRate}
         />
       )}
     </div>

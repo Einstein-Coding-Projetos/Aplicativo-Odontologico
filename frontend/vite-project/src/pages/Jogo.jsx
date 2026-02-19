@@ -45,7 +45,7 @@ export default function Jogo() {
   async function encerrarJogo() {
     setJogoIniciado(false);
     setFinalizado(true);
-    const response = await finalizarPartida(criancaId, pontos);
+    const response = await finalizarPartida(criancaId, pontos, dificuldade);
     setBadges(response.data.badges_novos);
   }
 
@@ -54,14 +54,39 @@ export default function Jogo() {
   };
 
   if (finalizado) {
-    return (
-      <div style={{ textAlign: "center" }}>
-        <h1>Partida Finalizada 🎉</h1>
-        <p>Pontos: {pontos}</p>
-        <button onClick={() => setFinalizado(false)}>Voltar</button>
-      </div>
-    );
-  }
+  return (
+    <div style={{ textAlign: "center" }}>
+      <h1>🎉 Partida Finalizada!</h1>
+
+      <h2>Pontuação: {pontos}</h2>
+
+      {badges.length > 0 ? (
+        <div style={{ marginTop: "20px" }}>
+          <h3>🏅 Badges conquistados:</h3>
+
+          {badges.map((badge, index) => (
+            <p key={index}>{badge}</p>
+          ))}
+        </div>
+      ) : (
+        <p>Nenhum badge conquistado desta vez 😢</p>
+      )}
+
+      <br />
+
+      <button
+        onClick={() => setFinalizado(false)}
+        style={{
+          padding: "10px 20px",
+          fontSize: "16px",
+          cursor: "pointer"
+        }}
+      >
+        Voltar
+      </button>
+    </div>
+  );
+}
 
   return (
     <div style={{ textAlign: "center" }}>
@@ -89,6 +114,13 @@ export default function Jogo() {
       <GameContainer
         jogoAtivo={jogoIniciado}
         onKill={adicionarPontos}
+        spawnRate={
+          dificuldade === "facil"
+            ? 1500
+            : dificuldade === "intermediario"
+            ? 1000
+            : 600
+        }
       />
     </div>
   );

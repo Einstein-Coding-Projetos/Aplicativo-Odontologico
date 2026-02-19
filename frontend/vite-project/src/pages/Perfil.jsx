@@ -49,52 +49,55 @@ export default function Perfil() {
   const [showEdit, setShowEdit] = useState(false); // Modal de edição
   const [editType, setEditType] = useState(""); // "email" ou "senha"
 
-  useEffect(() => {
-    // Injeta a fonte Nunito (Google Fonts) dinamicamente para garantir o visual arredondado
-    const link = document.createElement("link");
-    link.href = "https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap";
-    link.rel = "stylesheet";
-    document.head.appendChild(link);
+useEffect(() => {
+  // Injeta a fonte Nunito (Google Fonts) dinamicamente para garantir o visual arredondado
+  const link = document.createElement("link");
+  link.href = "https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap";
+  link.rel = "stylesheet";
+  document.head.appendChild(link);
 
-    async function fetchPerfil() {
-      if (!user) return;
-      
-      const usuarioReal = user.user || user;
-      const userId = usuarioReal.id || usuarioReal.user_id || usuarioReal.pk || usuarioReal.sub;
-      let username = typeof usuarioReal === "string" ? usuarioReal : (usuarioReal.username || usuarioReal.name);
+  async function fetchPerfil() {
+    if (!user) return;
 
-      if (!username) username = localStorage.getItem("username");
-      if (username === "null" || username === "undefined") username = null;
+    const token = localStorage.getItem("access");
 
-      const identificador = userId || username;
-
-      if (!identificador) {
-        setErro("Não foi possível identificar o usuário logado.");
-        return;
-      }
-      
-      const url = `http://127.0.0.1:8000/api/game/obter-perfil/?user=${encodeURIComponent(identificador)}`;
-      const token = localStorage.getItem("access");
-
-      try {
-        const response = await fetch(url, {
-          headers: { "Authorization": `Bearer ${token}` },
-          cache: "no-store" // Garante que sempre busque os dados mais recentes
-        }); 
-        if (response.ok) {
-          const data = await response.json();
-          setPerfil(data);
-          setErro(null);
-        } else {
-          setErro("Erro ao carregar perfil.");
-        }
-      } catch (error) {
-        setErro("Erro de conexão com o servidor.");
-      }
+    if (!token) {
+      setErro("Usuário não autenticado.");
+      return;
     }
 
-    fetchPerfil();
-  }, [user]);
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/game/obter-perfil/",
+        {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          },
+          cache: "no-store"
+        }
+      );
+
+      if (response.status === 401) {
+        setErro("Sessão expirada. Faça login novamente.");
+        return;
+      }
+
+      if (!response.ok) {
+        setErro("Erro ao carregar perfil.");
+        return;
+      }
+
+      const data = await response.json();
+      setPerfil(data);
+      setErro(null);
+
+    } catch (error) {
+      setErro("Erro de conexão com o servidor.");
+    }
+  }
+
+  fetchPerfil();
+}, [user]);
 
   // Estilos de erro mantidos, mas suavizados
   if (erro) return (
@@ -232,7 +235,7 @@ export default function Perfil() {
                background: "#FEF3C7", color: "#D97706", padding: "4px 12px", borderRadius: "20px", 
                fontSize: "0.75rem", fontWeight: "700", textTransform: "uppercase" 
              }}>
-               {perfil.badges.length > 0 ? perfil.badges[perfil.badges.length - 1] : "Novato"}
+               {perfil.badges.length > 0 ? perfil.badges[perfil.badges.length - 1] : "Escovador iniciante"}
              </span>
           </div>
 

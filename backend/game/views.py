@@ -51,7 +51,6 @@ def obter_dados_perfil(crianca):
         crianca.pontos_totais = total_pontos
         crianca.save()
 
-    verificar_badges(crianca)
     atualizar_nivel(crianca)
 
     badges = CriancaBadge.objects.filter(crianca=crianca)\
@@ -95,21 +94,10 @@ def obter_dados_perfil(crianca):
 # 👤 Perfil unificado
 @api_view(["GET"])
 def perfil_unificado(request):
-    identificador = request.query_params.get("user")
+    if not request.user.is_authenticated:
+        return Response({"erro": "Não autenticado"}, status=401)
 
-    if not identificador:
-        return Response({"erro": "Identificador não fornecido"}, status=400)
-
-    user = None
-
-    if identificador.isdigit():
-        user = User.objects.filter(id=int(identificador)).first()
-
-    if not user:
-        user = User.objects.filter(username__iexact=identificador).first()
-
-    if not user:
-        return Response({"erro": "Usuário não encontrado"}, status=404)
+    user = request.user
 
     crianca, _ = Crianca.objects.get_or_create(
         usuario=user,
@@ -166,24 +154,22 @@ def finalizar_partida(request):
     try:
         crianca_id = request.data["crianca_id"]
         pontos = int(request.data["pontos"])
+        dificuldade = request.data.get("dificuldade", "facil")
 
         crianca = Crianca.objects.get(id=crianca_id)
 
         PartidaJogo.objects.create(
             crianca=crianca,
-            pontos=pontos
+            pontos=pontos,
+            dificuldade=dificuldade
         )
 
-        crianca.pontos_totais += pontos
-        crianca.save()
-
-        novos_badges = verificar_badges(crianca)
+        novos_badges = verificar_badges(crianca, pontos)
         atualizar_nivel(crianca)
 
         return Response({
             "msg": "Partida finalizada",
             "pontos_ganho": pontos,
-            "pontos_totais": crianca.pontos_totais,
             "badges_novos": novos_badges
         })
 

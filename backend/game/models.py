@@ -31,6 +31,7 @@ class PartidaJogo(models.Model):
         related_name="partidas"
     )
     pontos = models.IntegerField()
+    dificuldade = models.CharField(max_length=20, default="facil")
     criada_em = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

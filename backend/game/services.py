@@ -4,18 +4,24 @@ from .models import Badge, CriancaBadge
 
 from .models import ProgressoPremio, Premio
 
+from .models import Badge, CriancaBadge, ProgressoPremio, Premio
+
+
 def verificar_badges(crianca, pontos_partida):
-    badges_possiveis = Badge.objects.filter(
+    """
+    A criança pode ganhar os mesmos badges várias vezes.
+    Cada partida gera novos registros.
+    """
+
+    # Busca badges compatíveis com a pontuação da partida
+    badges_ganhos = Badge.objects.filter(
         pontos_minimos__lte=pontos_partida
     )
 
-    # Remove badges que a criança não merece mais (caso os pontos tenham diminuído)
-    CriancaBadge.objects.filter(crianca=crianca).exclude(badge__in=badges_possiveis).delete()
-
     novos_badges = []
 
-    for badge in badges_possiveis:
-        # salva histórico
+    for badge in badges_ganhos:
+        # SEM verificar se já existe
         CriancaBadge.objects.create(
             crianca=crianca,
             badge=badge
@@ -23,8 +29,10 @@ def verificar_badges(crianca, pontos_partida):
 
         novos_badges.append(badge.nome)
 
-        # atualiza progresso dos prêmios relacionados
-        premios_relacionados = Premio.objects.filter(badge_requerida=badge)
+        # Atualiza progresso dos prêmios relacionados
+        premios_relacionados = Premio.objects.filter(
+            badge_requerida=badge
+        )
 
         for premio in premios_relacionados:
             progresso, _ = ProgressoPremio.objects.get_or_create(

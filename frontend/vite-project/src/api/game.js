@@ -6,10 +6,11 @@ export function iniciarJogo(criancaId) {
   });
 }
 
-export function finalizarPartida(criancaId, pontos) {
+export function finalizarPartida(criancaId, pontos, dificuldade) {
   return api.post("game/finalizar/", {
     crianca_id: criancaId,
     pontos: pontos,
+    dificuldade: dificuldade,
   });
 }
 
