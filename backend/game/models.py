@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class Crianca(models.Model):
@@ -68,6 +70,7 @@ class Premio(models.Model):
     def __str__(self):
         return self.nome
 
+
 class ProgressoPremio(models.Model):
     crianca = models.ForeignKey(Crianca, on_delete=models.CASCADE)
     premio = models.ForeignKey(Premio, on_delete=models.CASCADE)
@@ -75,3 +78,9 @@ class ProgressoPremio(models.Model):
 
     def __str__(self):
         return f"{self.crianca.nome} - {self.premio.nome}: {self.quantidade_atual}"
+
+
+@receiver(post_save, sender=User)
+def criar_perfil_crianca(sender, instance, created, **kwargs):
+    if created:
+        Crianca.objects.create(usuario=instance, nome=instance.username)

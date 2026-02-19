@@ -9,6 +9,9 @@ def verificar_badges(crianca, pontos_partida):
         pontos_minimos__lte=pontos_partida
     )
 
+    # Remove badges que a criança não merece mais (caso os pontos tenham diminuído)
+    CriancaBadge.objects.filter(crianca=crianca).exclude(badge__in=badges_possiveis).delete()
+
     novos_badges = []
 
     for badge in badges_possiveis:
@@ -46,3 +49,17 @@ def definir_foco(perfil):
         return "fio_dental"
 
     return "padrao"
+
+def atualizar_nivel(crianca):
+    PONTOS_POR_NIVEL = 100
+    MAX_NIVEL = 10
+
+    # Calcula o nível: a cada 100 pontos sobe 1. Começa no 1.
+    novo_nivel = (crianca.pontos_totais // PONTOS_POR_NIVEL) + 1
+
+    if novo_nivel > MAX_NIVEL:
+        novo_nivel = MAX_NIVEL
+
+    if crianca.nivel != novo_nivel:
+        crianca.nivel = novo_nivel
+        crianca.save()
