@@ -9,8 +9,9 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const token = localStorage.getItem("access");
+    const storedUsername = localStorage.getItem("username");
     if (token) {
-      setUser({ logged: true });
+      setUser({ logged: true, username: storedUsername });
     }
     setLoading(false);
   }, []);
@@ -31,13 +32,15 @@ export function AuthProvider({ children }) {
 
     localStorage.setItem("access", response.data.access);
     localStorage.setItem("refresh", response.data.refresh);
+    localStorage.setItem("username", username);
 
-    setUser({ username });
+    setUser({ username, logged: true });
   };
 
   const logout = () => {
     localStorage.removeItem("access");
     localStorage.removeItem("refresh");
+    localStorage.removeItem("username");
     setUser(null);
   };
 
@@ -47,5 +50,3 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
-
-
