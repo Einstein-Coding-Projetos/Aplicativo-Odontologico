@@ -3,18 +3,69 @@ import logoHJE from "../assets/HJE2.ico";
 
 export default function PublicLayout() {
   return (
-    <div className="public-container">
-      <div className="public-card">
-        <h2>🦷 OdontoGame</h2>
-        <Outlet />
-      </div>
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: "#F3F4F6",
+        fontFamily: "'Nunito', sans-serif"
+      }}
+    >
 
-      <footer style={{ marginTop: "20px", textAlign: "center", color: "#666", fontSize: "0.8rem", opacity: 0.8 }}>
-         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-            <span>Desenvolvido por Healthtech Júnior Einstein</span>
-            <img src={logoHJE} alt="HJE" style={{ height: "20px", opacity: 0.8 }} />
-         </div>
+      {/* HEADER FIXO EM CIMA */}
+      <header
+        style={{
+          backgroundColor: "white",
+          padding: "20px",
+          textAlign: "center",
+          boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+          fontWeight: "800",
+          fontSize: "1.4rem",
+          color: "#0ea5e9"
+        }}
+      >
+        🦷 OdontoGame
+      </header>
+
+      {/* CONTEÚDO CENTRAL */}
+      <main
+        style={{
+          flex: 1,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "20px"
+        }}
+      >
+        <Outlet />
+      </main>
+
+      {/* FOOTER FIXO EMBAIXO */}
+      <footer
+        style={{
+          backgroundColor: "white",
+          borderTop: "1px solid #e5e7eb",
+          padding: "20px",
+          textAlign: "center"
+        }}
+      >
+        <div
+          style={{
+            opacity: 0.6,
+            fontSize: "0.8rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+            color: "#64748b"
+          }}
+        >
+          <span>Desenvolvido por Healthtech Júnior Einstein</span>
+          <img src={logoHJE} alt="HJE" style={{ height: "24px" }} />
+        </div>
       </footer>
+
     </div>
   );
 }
