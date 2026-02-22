@@ -81,6 +81,7 @@ def obter_dados_perfil(crianca):
     ]
 
     return {
+        "id": crianca.id,
         "nome": crianca.nome,
         "email": crianca.usuario.email,
         "pontos_totais": crianca.pontos_totais,
@@ -167,10 +168,27 @@ def finalizar_partida(request):
         novos_badges = verificar_badges(crianca, pontos)
         atualizar_nivel(crianca)
 
+        # Recalcula pontos totais para retorno atualizado
+        total_pontos = PartidaJogo.objects.filter(crianca=crianca).aggregate(Sum('pontos'))['pontos__sum'] or 0
+        
+        # Busca o próximo badge para a barra de progresso
+        proximo_badge_obj = Badge.objects.filter(
+            pontos_minimos__gt=total_pontos
+        ).order_by("pontos_minimos").first()
+
+        proximo_badge_data = None
+        if proximo_badge_obj:
+            proximo_badge_data = {
+                "nome": proximo_badge_obj.nome,
+                "pontos": proximo_badge_obj.pontos_minimos
+            }
+
         return Response({
             "msg": "Partida finalizada",
             "pontos_ganho": pontos,
-            "badges_novos": novos_badges
+            "badges_novos": novos_badges,
+            "pontos_totais": total_pontos,
+            "proximo_badge": proximo_badge_data
         })
 
     except Crianca.DoesNotExist:

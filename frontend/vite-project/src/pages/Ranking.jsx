@@ -19,10 +19,13 @@ export default function Ranking() {
       setLoading(true);
       try {
         const token = localStorage.getItem("access");
+        const headers = {};
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+
         const response = await fetch(`http://127.0.0.1:8000/api/game/ranking/?page=${page}`, {
-             headers: {
-            "Authorization": `Bearer ${token}`
-          }
+             headers: headers
         });
         if (response.ok) {
           const data = await response.json();
@@ -45,33 +48,52 @@ export default function Ranking() {
   if (loading) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#F3F4F6', color: '#8B5CF6', fontFamily: "'Nunito', sans-serif", fontWeight: 'bold' }}>Carregando ranking...</div>;
 
   return (
-    <div style={{ 
-      minHeight: "100vh", 
-      backgroundColor: "#F3F4F6", 
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      padding: "20px",
-      fontFamily: "'Nunito', sans-serif"
-    }}>
+    <div className="page-container">
       {/* Estilos de Animação */}
       <style>{`
         @keyframes slideUpFade {
           from { opacity: 0; transform: translateY(40px) scale(0.95); }
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
+        
+        .page-container {
+          min-height: 100vh;
+          background-color: #F3F4F6;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-family: 'Nunito', sans-serif;
+          box-sizing: border-box;
+          padding: 0; /* Mobile: Full screen */
+          overflow-x: hidden;
+        }
+
+        .ranking-card {
+          width: 100%;
+          min-height: 100vh; /* Mobile: Altura total */
+          background-color: #fff;
+          border-radius: 0;
+          box-shadow: none;
+          overflow: hidden;
+          position: relative;
+          animation: slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+          display: flex;
+          flex-direction: column;
+        }
+
+        @media (min-width: 768px) {
+          .page-container { padding: 20px; }
+          .ranking-card {
+            min-height: auto;
+            max-width: 900px; /* Maior no PC */
+            width: 90%;
+            border-radius: 35px;
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
+          }
+        }
       `}</style>
       
-      <div style={{ 
-        width: "100%", 
-        maxWidth: "450px", 
-        backgroundColor: "#fff", 
-        borderRadius: "35px", 
-        boxShadow: "0 20px 40px rgba(139, 92, 246, 0.15)", 
-        overflow: "hidden",
-        position: "relative",
-        animation: "slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1)"
-      }}>
+      <div className="ranking-card">
         
         {/* Header */}
         <div style={{ 
@@ -96,7 +118,8 @@ export default function Ranking() {
           borderRadius: "30px 30px 0 0", 
           padding: "25px", 
           position: "relative",
-          minHeight: "400px"
+          minHeight: "400px",
+          flex: 1 // Preenche o espaço restante
         }}>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>

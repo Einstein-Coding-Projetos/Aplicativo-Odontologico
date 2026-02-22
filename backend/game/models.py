@@ -84,4 +84,12 @@ class ProgressoPremio(models.Model):
 @receiver(post_save, sender=User)
 def criar_perfil_crianca(sender, instance, created, **kwargs):
     if created:
-        Crianca.objects.create(usuario=instance, nome=instance.username)
+        crianca = Crianca.objects.create(usuario=instance, nome=instance.username)
+        
+        # Atribui o badge inicial "Escovador Iniciante" automaticamente
+        try:
+            badge_inicial = Badge.objects.filter(nome="Escovador Iniciante").first()
+            if badge_inicial:
+                CriancaBadge.objects.create(crianca=crianca, badge=badge_inicial)
+        except Exception:
+            pass

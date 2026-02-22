@@ -44,7 +44,7 @@ const StarRating = ({ level }) => {
 export default function Perfil() {
   const { user, logout } = useContext(AuthContext);
   const [perfil, setPerfil] = useState(null);
-  const [erro, setErro] = useState(null);
+    const [erro, setErro] = useState(null);
   const [showBadges, setShowBadges] = useState(false);
   const [showEdit, setShowEdit] = useState(false); // Modal de edição
   const [editType, setEditType] = useState(""); // "email" ou "senha"
@@ -97,7 +97,7 @@ useEffect(() => {
   }
 
   fetchPerfil();
-}, [user]);
+}, [user, logout]);
 
   // Estilos de erro mantidos, mas suavizados
   if (erro) return (
@@ -113,7 +113,7 @@ useEffect(() => {
   if (!perfil) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#F3F4F6', color: '#8B5CF6', fontFamily: "'Nunito', sans-serif", fontWeight: 'bold' }}>Carregando seu perfil...</div>;
 
   // Lógica de XP para o Frontend
-  const XP_POR_NIVEL = 100;
+  const XP_POR_NIVEL = 2000;
   const isMaxLevel = perfil.nivel >= 10;
   const xpAtual = isMaxLevel ? XP_POR_NIVEL : (perfil.pontos_totais % XP_POR_NIVEL);
 
@@ -165,19 +165,26 @@ useEffect(() => {
           from { opacity: 0; transform: translateY(40px) scale(0.95); }
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
+        .profile-card {
+          width: 100%;
+          max-width: 400px;
+          background-color: #fff;
+          border-radius: 35px;
+          box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
+          overflow: hidden;
+          position: relative;
+          animation: slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        @media (min-width: 768px) {
+          .profile-card {
+            max-width: 900px; /* Maior no PC */
+            width: 90%;
+          }
+        }
       `}</style>
       
       {/* Container Principal (O "Celular" da imagem) */}
-      <div style={{ 
-        width: "100%", 
-        maxWidth: "400px", 
-        backgroundColor: "#fff", 
-        borderRadius: "35px", 
-        boxShadow: "0 20px 40px rgba(139, 92, 246, 0.15)", // Sombra roxa suave
-        overflow: "hidden",
-        position: "relative",
-        animation: "slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1)" // Animação suave de entrada
-      }}>
+      <div className="profile-card">
 
         {/* 1. Header Roxo (Gradiente igual ao da imagem) */}
         <div style={{ 
