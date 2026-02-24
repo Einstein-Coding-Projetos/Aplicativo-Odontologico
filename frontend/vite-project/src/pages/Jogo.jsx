@@ -4,9 +4,16 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../auth/AuthContext";
 import useMouthDetection from "../hooks/useMouthDetection";
 
+import dentista from "../assets/dentista_transparente.png";
+import fada from "../assets/fada_transparente.png";
+import monstro from "../assets/monstro_transparente.png";
+import principe from "../assets/principe_transparente.png";
+import rei from "../assets/rei_transparente.png";
 import germ1 from "../assets/germs/germ_transparente_1.png";
 import germ2 from "../assets/germs/germ_transparente_2.png";
-const germImages = [germ1, germ2];
+import germ3 from "../assets/germs/germ_transparente_3.png";
+import germ4 from "../assets/germs/germ_transparente_4.png";
+const germImages = [germ1, germ2, germ3, germ4];
 
 // Componente visual para Barra de Progresso (Estilo Perfil.jsx)
 const StatBar = ({ label, value, max, color, showMax = false }) => {
@@ -20,7 +27,7 @@ const StatBar = ({ label, value, max, color, showMax = false }) => {
       <div style={{ width: "100%", height: "8px", backgroundColor: "#F3F4F6", borderRadius: "10px", overflow: "hidden" }}>
         <div style={{ width: `${percentage}%`, height: "100%", backgroundColor: color, borderRadius: "10px", transition: "width 1s cubic-bezier(0.4, 0, 0.2, 1)" }} />
       </div>
-    </div>
+    </div> 
   );
 };
 
@@ -28,6 +35,7 @@ export default function Jogo() {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [criancaId, setCriancaId] = useState(null);
+
   
   // Estados do Jogo
   const [dificuldade, setDificuldade] = useState("facil");
@@ -38,6 +46,18 @@ export default function Jogo() {
   const [badges, setBadges] = useState([]);
   const [germes, setGermes] = useState([]);
   const [progresso, setProgresso] = useState(null); // Estado para guardar dados do próximo nível
+  const [personagemLiberado, setPersonagemLiberado] = useState(false);
+  const [personagemAtivo, setPersonagemAtivo] = useState(null);
+  const [monstroTremendo, setMonstroTremendo] = useState(true);
+
+  //todos os personagens dentro do jogo
+  const imagensPersonagens = {
+  "dentista_transparente.png": dentista,
+  "fada_transparente.png": fada,
+  "monstro_transparente.png": monstro,
+  "principe_transparente.png": principe,
+  "rei_transparente.png": rei,
+};
 
   // Detecção Facial
   const videoRef = useRef(null);
@@ -103,6 +123,40 @@ export default function Jogo() {
     }
     fetchCriancaId();
   }, [user, navigate]);
+
+//Monstro tremendo
+useEffect(() => {
+  if (!jogoIniciado) {
+    setMonstroTremendo(true);
+
+    const timer = setTimeout(() => {
+      setMonstroTremendo(false);
+    }, 3000); // treme por 3 segundos
+
+    return () => clearTimeout(timer);
+  }
+}, [jogoIniciado]);
+
+  //bucando o ativo
+  useEffect(() => {
+  if (!criancaId) return;
+
+  async function buscarAtivo() {
+    const token = localStorage.getItem("access");
+
+    const response = await fetch(
+      `http://127.0.0.1:8000/api/game/personagens/${criancaId}/`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    const data = await response.json();
+
+    const ativo = data.find(p => p.ativo);
+    if (ativo) setPersonagemAtivo(ativo);
+  }
+
+  buscarAtivo();
+}, [criancaId]);
 
   // 2. Inicializar Câmera
   useEffect(() => {
@@ -213,22 +267,32 @@ export default function Jogo() {
   }
 
   async function encerrarJogo() {
-    setJogoIniciado(false);
-    setFinalizado(true);
-    setGermes([]);
-    if (criancaId) {
-      try {
-        const response = await finalizarPartida(criancaId, pontos, dificuldade);
-        setBadges(response?.data?.badges_novos || []);
-        setProgresso({
-          pontosTotais: response?.data?.pontos_totais || 0,
-          proximoBadge: response?.data?.proximo_badge || null
-        });
-      } catch (error) {
-        console.error("Erro ao salvar partida", error);
+  setJogoIniciado(false);
+  setFinalizado(true);
+  setGermes([]);
+
+  if (criancaId) {
+    try {
+      const response = await finalizarPartida(criancaId, pontos, dificuldade);
+
+      setBadges(response?.data?.badges_novos || []);
+
+      setProgresso({
+        pontosTotais: response?.data?.pontos_totais || 0,
+        proximoBadge: response?.data?.proximo_badge || null
+      });
+
+      if (response?.data?.personagens_disponiveis?.length > 0) {
+        setPersonagemLiberado(true);
+        localStorage.setItem("notificacao_personagem","true");
+        window.dispatchEvent(new Event("notificacaoAtualizada"));
       }
+
+    } catch (error) {
+      console.error("Erro ao salvar partida", error);
     }
   }
+}
 
   function desistirJogo() {
     setJogoIniciado(false);
@@ -279,6 +343,11 @@ export default function Jogo() {
       50% { transform: scale(1.05); }
       100% { transform: scale(1); }
     }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
     
     .page-container {
       min-height: 100vh;
@@ -291,6 +360,37 @@ export default function Jogo() {
       box-sizing: border-box;
       padding: 0; /* Mobile: Sem padding para ocupar tudo */
       overflow-x: hidden;
+    }
+
+    /* ===== BALÃO DE FALA ===== */
+    .speech-bubble {
+      position: fixed;
+      max-width: 220px;
+      background: white;
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      z-index: 6;
+      animation: popIn 0.4s ease;
+    }
+
+    .speech-bubble::after {
+      content: "";
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-style: solid;
+    }
+
+    @keyframes shakeMonster {
+      0% { transform: translate(0px, 0px); }
+      20% { transform: translate(-4px, 3px); }
+      40% { transform: translate(4px, -3px); }
+      60% { transform: translate(-3px, 2px); }
+      80% { transform: translate(3px, -2px); }
+      100% { transform: translate(0px, 0px); }
     }
 
     /* Estilos Responsivos */
@@ -340,6 +440,98 @@ export default function Jogo() {
   if (finalizado) return (
     <div className="page-container">
       <style>{styles}</style>
+
+      {personagemLiberado && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0,0,0,0.6)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+            animation: "fadeIn 0.3s ease"
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              padding: "35px",
+              borderRadius: "25px",
+              textAlign: "center",
+              maxWidth: "350px",
+              width: "90%",
+              boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
+              animation: "popIn 0.4s ease"
+            }}
+          >
+            {/* ❌ BOTÃO FECHAR */}
+            <button
+              onClick={() => setPersonagemLiberado(false)}
+              style={{
+                position: "absolute",
+                top: "15px",
+                right: "15px",
+                width: "32px",
+                height: "32px",
+                borderRadius: "50%",
+                border: "none",
+                backgroundColor: "#F3F4F6",
+                fontSize: "1rem",
+                fontWeight: "bold",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.2s ease"
+              }}
+            >
+              ✕
+            </button>
+
+            <h2 style={{ marginBottom: "15px", color: "#8B5CF6" }}>
+              🎉 Novo Herói Liberado!
+            </h2>
+
+            <p style={{ marginBottom: "25px", fontWeight: "600", color: "#374151" }}>
+              Você conquistou um novo personagem!
+              <br />
+              Clique abaixo para desbloquear.
+            </p>
+
+            <button
+              onClick={() => navigate("/personagens")}
+              style={{
+                width: "100%",
+                padding: "14px",
+                borderRadius: "15px",
+                border: "none",
+                background: "linear-gradient(90deg, #8B5CF6, #6366F1)",
+                color: "white",
+                fontWeight: "800",
+                fontSize: "1rem",
+                cursor: "pointer",
+                boxShadow: "0 10px 20px rgba(139, 92, 246, 0.3)"
+              }}
+            >
+              🔓 Ir desbloquear agora!
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div style={{
+        position:"relative",
+        width:"100%",
+        display: "flex",
+        justifyContent:"center"
+      }}>
+
+      </div>
       <div className="game-card">
         {/* Header */}
         <div style={headerStyle}>
@@ -381,6 +573,25 @@ export default function Jogo() {
           >
             JOGAR NOVAMENTE
           </button>
+          <button 
+            onClick={() => navigate("/personagens")}
+            style={{
+              width: "100%",
+              marginTop: "12px",
+              padding: "14px",
+              background: "linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%)",
+              color: "white",
+              border: "none",
+              borderRadius: "15px",
+              fontWeight: "800",
+              fontSize: "1.2rem",
+              boxShadow: "0 5px 15px rgba(245, 158, 11, 0.3)",
+              cursor: "pointer",
+              transition: "transform 0.2s ease"
+            }}
+          >
+            🔓 Ver próximos heróis desbloqueados
+          </button>
         </div>
       </div>
     </div>
@@ -388,12 +599,124 @@ export default function Jogo() {
 
   // Tela Principal do Jogo
   return (
-    <div className="page-container">
-      {/* Estilos Globais de Animação */}
-      <style>{styles}</style>
+  <div className="page-container">
+    <style>{styles}</style>
+
+    {/* 👾 MONSTRO */}
+    {!jogoIniciado && (
+      <>
+        <img
+          src={monstro}
+          alt="Monstro"
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            left: "20px",
+            width: "110px",
+            zIndex: 5
+          }}
+        />
+
+        <div
+          className="speech-bubble"
+          style={{
+            bottom: "140px",
+            left: "20px"
+          }}>
+
+        😈 Você nunca vai conseguir nos destruir!
+        <div
+          style={{
+            position: "absolute",
+            bottom: "-12px",
+            left: "30px",
+            width: 0,
+            height: 0,
+            borderLeft: "10px solid transparent",
+            borderRight: "10px solid transparent",
+            borderTop: "12px solid white"
+          }}
+        />
+      </div>
+    </>
+  )}
+
+    {/* 👑 PERSONAGEM ATIVO */}
+    {!jogoIniciado && personagemAtivo && (
+      <>
+        <img
+          src={imagensPersonagens[personagemAtivo.asset_nome]}
+          alt="Personagem ativo"
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            right: "20px",
+            width: "120px",
+            zIndex: 5
+          }}
+        />
+
+        <div
+          className="speech-bubble"
+          style={{
+            bottom: "150px",
+            right: "20px",
+            background: "#E0F2FE"
+          }}
+        >
+          💪 Vamos sim! Vamos matar todos os bichinhos!
+          <br />
+          Consegue me ajudar, {user?.first_name || user?.username}?
+          <div
+            style={{
+              position: "absolute",
+              bottom: "-12px",
+              right: "30px",
+              width: 0,
+              height: 0,
+              borderLeft: "10px solid transparent",
+              borderRight: "10px solid transparent",
+              borderTop: "12px solid #E0F2FE"
+            }}
+          />
+        </div>
+      </>
+    )}
+
+    {/* 👑 Personagem canto inferior direito */}
+      {!jogoIniciado && personagemAtivo && (
+        <img
+          src={imagensPersonagens[personagemAtivo.asset_nome]}
+          alt="Personagem ativo"
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            right: "20px",
+            width: "120px",
+            zIndex: 5,
+            pointerEvents: "none"
+          }}
+        />
+      )}
+
+      {/* 👾 Monstro canto inferior esquerdo */}
+      {!jogoIniciado && (
+        <img
+          src={monstro}
+          alt="Monstro"
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            left: "20px",
+            width: "110px",
+            zIndex: 5,
+          }}
+        />
+      )}
       
       {!jogoIniciado ? (
         <div className="game-card">
+
           <div style={headerStyle}>
              <h1 style={{ margin: "0", fontSize: "2rem", fontWeight: "800", letterSpacing: "0.5px" }}>Caça aos Germes</h1>
              <p style={{ margin: "5px 0 0", fontSize: "0.9rem", opacity: 0.9, fontWeight: "600" }}>Prepare sua escova!</p>

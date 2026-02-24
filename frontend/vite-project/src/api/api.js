@@ -20,5 +20,5 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export default api; // 👈 FALTAVA ISSO
+export default api; 
 

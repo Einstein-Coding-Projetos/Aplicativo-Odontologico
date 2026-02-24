@@ -8,6 +8,9 @@ from .views import (
     perfil_unificado,
     ranking_global,
     atualizar_usuario,
+    desbloquear_personagem,
+    listar_personagens,
+    ativar_personagem,
 )
 
 urlpatterns = [
@@ -21,4 +24,8 @@ urlpatterns = [
     path("ranking/", ranking_global, name="ranking_global"),
     path("obter-perfil/", perfil_unificado, name="obter_perfil"),
     path("atualizar-usuario/", atualizar_usuario, name="atualizar_usuario"),
+
+    path("desbloquear-personagem/", desbloquear_personagem),
+    path("personagens/<int:crianca_id>/", listar_personagens),
+    path("ativar_personagem/", ativar_personagem),
 ]

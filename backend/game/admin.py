@@ -6,7 +6,9 @@ from .models import (
     PerfilEducacional,
     PartidaJogo,
     Badge,
-    CriancaBadge
+    CriancaBadge,
+    Personagem,
+    CriancaPersonagem
 )
 
 admin.site.register(Crianca)
@@ -14,3 +16,13 @@ admin.site.register(PerfilEducacional)
 admin.site.register(PartidaJogo)
 admin.site.register(Badge)
 admin.site.register(CriancaBadge)
+
+
+@admin.register(Personagem)
+class PersonagemAdmin(admin.ModelAdmin):
+    list_display = ("nome", "pontos_necessarios")
+
+
+@admin.register(CriancaPersonagem)
+class CriancaPersonagemAdmin(admin.ModelAdmin):
+    list_display = ("crianca", "personagem", "ativo", "data_desbloqueio")

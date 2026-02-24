@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-from .services import verificar_badges, definir_foco, atualizar_nivel
+from .services import verificar_badges, definir_foco, atualizar_nivel, verificar_personagens_disponiveis
 from .models import (
     Crianca,
     PerfilEducacional,
@@ -13,7 +13,9 @@ from .models import (
     CriancaBadge,
     Premio,
     ProgressoPremio,
-    Badge
+    Badge,
+    CriancaPersonagem,
+    Personagem,
 )
 
 
@@ -80,6 +82,21 @@ def obter_dados_perfil(crianca):
         for p in partidas
     ]
 
+    from .models import CriancaPersonagem
+
+    personagem_ativo = CriancaPersonagem.objects.filter(
+        crianca=crianca,
+        ativo=True
+    ).select_related("personagem").first()
+
+    personagem_data = None
+
+    if personagem_ativo:
+        personagem_data = {
+            "nome": personagem_ativo.personagem.nome,
+            "asset_nome": personagem_ativo.personagem.asset_nome
+        }
+
     return {
         "id": crianca.id,
         "nome": crianca.nome,
@@ -88,7 +105,8 @@ def obter_dados_perfil(crianca):
         "nivel": crianca.nivel,
         "badges": nomes_badges,
         "proximo_badge": proximo_badge,
-        "historico": historico
+        "historico": historico,
+        "personagem_ativo": personagem_data,
     }
 
 
@@ -152,6 +170,7 @@ def iniciar_jogo(request):
 # 🏁 Finalizar partida
 @api_view(["POST"])
 def finalizar_partida(request):
+
     try:
         crianca_id = request.data["crianca_id"]
         pontos = int(request.data["pontos"])
@@ -169,7 +188,17 @@ def finalizar_partida(request):
         atualizar_nivel(crianca)
 
         # Recalcula pontos totais para retorno atualizado
+        total_pontos = PartidaJogo.objects.filter(crianca=crianca)\
+            .aggregate(Sum('pontos'))['pontos__sum'] or 0
+
+        if crianca.pontos_totais != total_pontos:
+            crianca.pontos_totais = total_pontos
+            crianca.save()
+
         total_pontos = PartidaJogo.objects.filter(crianca=crianca).aggregate(Sum('pontos'))['pontos__sum'] or 0
+
+        personagens_disponiveis = verificar_personagens_disponiveis(crianca)
+        print("PONTOS TOTAIS:", crianca.pontos_totais)
         
         # Busca o próximo badge para a barra de progresso
         proximo_badge_obj = Badge.objects.filter(
@@ -188,12 +217,135 @@ def finalizar_partida(request):
             "pontos_ganho": pontos,
             "badges_novos": novos_badges,
             "pontos_totais": total_pontos,
-            "proximo_badge": proximo_badge_data
+            "proximo_badge": proximo_badge_data,
+            "personagens_disponiveis": [
+                {
+                    "id": p.id,
+                        "nome": p.nome
+                }
+                for p in personagens_disponiveis
+            ],
         })
 
     except Crianca.DoesNotExist:
         return Response({"erro": "Criança não encontrada"}, status=404)
 
+@api_view(["POST"])
+def desbloquear_personagem(request):
+    try:
+        crianca_id = request.data["crianca_id"]
+        personagem_id = request.data["personagem_id"]
+
+        crianca = Crianca.objects.get(id=crianca_id)
+        personagem = Personagem.objects.get(id=personagem_id)
+
+        # Verifica se já desbloqueou
+        if CriancaPersonagem.objects.filter(
+            crianca=crianca,
+            personagem=personagem
+        ).exists():
+            return Response(
+                {"erro": "Personagem já desbloqueado"},
+                status=400
+            )
+
+        # Verifica se tem pontos suficientes
+        if crianca.pontos_totais < personagem.pontos_necessarios:
+            return Response(
+                {"erro": "Pontos insuficientes"},
+                status=400
+            )
+
+        CriancaPersonagem.objects.create(
+            crianca=crianca,
+            personagem=personagem,
+            ativo=False
+        )
+
+        return Response({
+            "msg": "Personagem desbloqueado com sucesso!"
+        })
+
+    except Crianca.DoesNotExist:
+        return Response({"erro": "Criança não encontrada"}, status=404)
+
+    except Personagem.DoesNotExist:
+        return Response({"erro": "Personagem não encontrado"}, status=404)
+
+@api_view(["GET"])
+def listar_personagens(request, crianca_id):
+    try:
+        crianca = Crianca.objects.get(id=crianca_id)
+
+        personagens = Personagem.objects.all().order_by("pontos_necessarios")
+
+        personagens_desbloqueados = CriancaPersonagem.objects.filter(
+            crianca=crianca
+        )
+
+        desbloqueados_ids = personagens_desbloqueados.values_list(
+            "personagem_id", flat=True
+        )
+
+        personagem_ativo = personagens_desbloqueados.filter(
+            ativo=True
+        ).first()
+
+        resultado = []
+
+        for p in personagens:
+            resultado.append({
+                "id": p.id,
+                "nome": p.nome,
+                "asset_nome": p.asset_nome,
+                "pontos_necessarios": p.pontos_necessarios,
+                "desbloqueado": p.id in desbloqueados_ids,
+                "ativo": personagem_ativo.personagem.id == p.id if personagem_ativo else False,
+                "pode_desbloquear": (
+                    crianca.pontos_totais >= p.pontos_necessarios
+                    and p.id not in desbloqueados_ids
+                )
+            })
+
+        return Response(resultado)
+
+    except Crianca.DoesNotExist:
+        return Response({"erro": "Criança não encontrada"}, status=404)
+    
+@api_view(["POST"])
+def ativar_personagem(request):
+    try:
+        crianca_id = request.data["crianca_id"]
+        personagem_id = request.data["personagem_id"]
+
+        crianca = Crianca.objects.get(id=crianca_id)
+
+        # Verifica se o personagem já foi desbloqueado
+        if not CriancaPersonagem.objects.filter(
+            crianca=crianca,
+            personagem_id=personagem_id
+        ).exists():
+            return Response(
+                {"erro": "Personagem não desbloqueado"},
+                status=400
+            )
+
+        # Desativa todos
+        CriancaPersonagem.objects.filter(
+            crianca=crianca
+        ).update(ativo=False)
+
+        # Ativa o escolhido
+        CriancaPersonagem.objects.filter(
+            crianca=crianca,
+            personagem_id=personagem_id
+        ).update(ativo=True)
+
+        return Response({"msg": "Personagem ativado com sucesso!"})
+
+    except Crianca.DoesNotExist:
+        return Response({"erro": "Criança não encontrada"}, status=404)
+    
 
 # 🎁 Trocar prêmio
 @api_view(["POST"])

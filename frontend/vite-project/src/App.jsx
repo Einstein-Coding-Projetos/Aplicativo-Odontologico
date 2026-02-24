@@ -9,6 +9,7 @@ import Jogo from "./pages/Jogo";
 import Perfil from "./pages/Perfil";
 import Register from "./pages/Register";
 import Ranking from "./pages/Ranking";
+import Personagens from "./pages/Personagens";
 
 import PublicLayout from "./components/PublicLayout";
 import PrivateLayout from "./components/PrivateLayout";
@@ -32,6 +33,7 @@ function App() {
             <Route path="/jogo" element={<Jogo />} />
             <Route path="/perfil" element={<Perfil />} />
             <Route path="/ranking" element={<Ranking />} />
+            <Route path="/personagens" element={<Personagens />} />
           </Route>
         </Route>
 

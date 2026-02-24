@@ -79,6 +79,34 @@ class ProgressoPremio(models.Model):
 
     def __str__(self):
         return f"{self.crianca.nome} - {self.premio.nome}: {self.quantidade_atual}"
+    
+class Personagem(models.Model):
+    nome = models.CharField(max_length=100)
+    asset_nome = models.CharField(max_length=100)  # nome do arquivo PNG no React
+    pontos_necessarios = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.nome} ({self.pontos_necessarios} pts)"
+
+
+class CriancaPersonagem(models.Model):
+    crianca = models.ForeignKey(
+        Crianca,
+        on_delete=models.CASCADE,
+        related_name="personagens_desbloqueados"
+    )
+    personagem = models.ForeignKey(
+        Personagem,
+        on_delete=models.CASCADE
+    )
+    ativo = models.BooleanField(default=False)
+    data_desbloqueio = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("crianca", "personagem")
+
+    def __str__(self):
+        return f"{self.crianca.nome} - {self.personagem.nome}"
 
 
 @receiver(post_save, sender=User)

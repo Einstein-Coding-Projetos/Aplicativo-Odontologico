@@ -1,5 +1,5 @@
 from django.db.models import Sum
-from .models import Badge, CriancaBadge, ProgressoPremio, Premio, PartidaJogo
+from .models import Badge, CriancaBadge, ProgressoPremio, Premio, PartidaJogo, Personagem, CriancaPersonagem
 
 
 def verificar_badges(crianca, pontos_partida):
@@ -66,3 +66,28 @@ def atualizar_nivel(crianca):
     if crianca.nivel != novo_nivel:
         crianca.nivel = novo_nivel
         crianca.save()
+
+
+def verificar_personagens_disponiveis(crianca):
+    """
+    Retorna todos os personagens que a criança já pode desbloquear
+    com base nos pontos totais, mas ainda não desbloqueou.
+    """
+
+    print("VERIFICANDO PERSONAGENS PARA:", crianca.pontos_totais)
+
+    # Personagens já desbloqueados pela criança
+    personagens_desbloqueados_ids = CriancaPersonagem.objects.filter(
+        crianca=crianca
+    ).values_list("personagem_id", flat=True)
+
+    # Personagens que já atingiram pontuação necessária
+    personagens_aptos = Personagem.objects.filter(
+        pontos_necessarios__lte=crianca.pontos_totais
+    ).exclude(id__in=personagens_desbloqueados_ids)
+
+    return personagens_aptos
+
+    
+
+

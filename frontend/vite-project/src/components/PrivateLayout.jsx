@@ -1,9 +1,44 @@
-import { useState } from "react";
-import { Outlet, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import logoHJE from "../assets/HJE2.ico";
 
 export default function PrivateLayout() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [temNotificacao, setTemNotificacao] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+  function verificarNotificacao() {
+    const notif = localStorage.getItem("notificacao_personagem");
+    setTemNotificacao(notif === "true");
+  }
+
+  verificarNotificacao();
+
+  window.addEventListener("storage", verificarNotificacao);
+
+  return () => {
+    window.removeEventListener("storage", verificarNotificacao);
+  };
+  }, []);
+
+  useEffect(() => {
+  const notif = localStorage.getItem("notificacao_personagem");
+  setTemNotificacao(notif === "true");
+  }, [location]);
+
+  useEffect(() => {
+  function atualizar() {
+    const notif = localStorage.getItem("notificacao_personagem");
+    setTemNotificacao(notif === "true");
+  }
+
+  window.addEventListener("notificacaoAtualizada", atualizar);
+
+  return () => {
+    window.removeEventListener("notificacaoAtualizada", atualizar);
+  };
+}, []);
 
   return (
     <div style={{ 
@@ -24,6 +59,18 @@ export default function PrivateLayout() {
         @media (max-width: 767px) {
           .nav-desktop { display: none !important; }
           .nav-mobile-btn { display: block !important; }
+        }
+
+        @keyframes pulse {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.3); }
+          100% { transform: scale(1); }
+        }
+
+        @media (min-width: 768px) {
+          .nav-desktop { display: flex !important; }
+          .nav-mobile-btn { display: none !important; }
+          .nav-mobile-menu { display: none !important; }
         }
       `}</style>
 
@@ -56,6 +103,27 @@ export default function PrivateLayout() {
                 <Link to="/jogo" style={navLinkStyle}>Jogo</Link>
                 <Link to="/ranking" style={navLinkStyle}>Ranking</Link>
                 <Link to="/perfil" style={navLinkStyle}>Perfil</Link>
+                <div style={{ position: "relative" }}>
+                  <Link to="/personagens" style={navLinkStyle}>
+                    Personagens
+                  </Link>
+
+                    {temNotificacao && (
+                      <span
+                        style={{
+                          position: "absolute",
+                          top: "-4px",
+                          right: "-10px",
+                          width: "10px",
+                          height: "10px",
+                          backgroundColor: "#EF4444",
+                          borderRadius: "50%",
+                          boxShadow: "0 0 0 2px white",
+                          animation: "pulse 1.2s infinite"
+                        }}
+                      />
+                    )}
+                  </div>
             </nav>
 
             {/* Botão Hamburguer Mobile */}
@@ -89,6 +157,29 @@ export default function PrivateLayout() {
                     <Link to="/jogo" onClick={() => setIsMenuOpen(false)} style={mobileNavLinkStyle}>Jogo</Link>
                     <Link to="/ranking" onClick={() => setIsMenuOpen(false)} style={mobileNavLinkStyle}>Ranking</Link>
                     <Link to="/perfil" onClick={() => setIsMenuOpen(false)} style={mobileNavLinkStyle}>Perfil</Link>
+                    <div style={{ position: "relative" }}>
+                      <Link 
+                        to="/personagens" 
+                        onClick={() => setIsMenuOpen(false)} 
+                        style={mobileNavLinkStyle}
+                      >
+                        Personagens
+                      </Link>
+
+                      {temNotificacao && (
+                        <span
+                          style={{
+                            position: "absolute",
+                            top: "8px",
+                            right: "12px",
+                            width: "10px",
+                            height: "10px",
+                            backgroundColor: "#EF4444",
+                            borderRadius: "50%"
+                          }}
+                        />
+                      )}
+                    </div>
                 </nav>
             </div>
         )}

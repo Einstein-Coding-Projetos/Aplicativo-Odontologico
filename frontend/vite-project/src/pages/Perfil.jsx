@@ -233,6 +233,59 @@ useEffect(() => {
           padding: "25px", 
           position: "relative"
         }}>
+
+          {/* 👑 PERSONAGEM ATIVO */}
+          {perfil.personagem_ativo && (
+            <div style={{
+              marginBottom: "25px",
+              padding: "20px",
+              borderRadius: "20px",
+              backgroundColor: "#F9FAFB",
+              border: "1px solid #F3F4F6",
+              boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
+              textAlign: "center"
+            }}>
+              <h3 style={{
+                margin: "0 0 10px 0",
+                fontSize: "2rem",
+                fontWeight: "1000",
+                color: "#1F2937"
+              }}>
+                👑 Seu herói da vez!
+              </h3>
+
+              <div style={{
+                width: "110px",
+                height: "110px",
+                margin: "0 auto",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}>
+                <img
+                  src={
+                    new URL(
+                      `../assets/${perfil.personagem_ativo.asset_nome}`,
+                      import.meta.url
+                    ).href
+                  }
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "100%",
+                    objectFit: "contain"
+                  }}
+                />
+            </div>
+
+            <p style={{
+              marginTop: "10px",
+              fontWeight: "700",
+              color: "#4B5563"
+            }}>
+              {perfil.personagem_ativo.nome}
+            </p>
+          </div>
+        )}
           
           {/* Badge Principal (Inspirado no título "Characters" da imagem) */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
