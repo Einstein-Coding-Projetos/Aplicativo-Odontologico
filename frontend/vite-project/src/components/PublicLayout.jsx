@@ -9,7 +9,7 @@ export default function PublicLayout() {
         display: "flex",
         flexDirection: "column",
         backgroundColor: "#F3F4F6",
-        fontFamily: "'Nunito', sans-serif"
+        fontFamily: "'Baloo 2', sans-serif"
       }}
     >
 
@@ -21,11 +21,11 @@ export default function PublicLayout() {
           textAlign: "center",
           boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
           fontWeight: "800",
-          fontSize: "1.4rem",
+          fontSize: "3.0rem",
           color: "#0ea5e9"
         }}
       >
-        🦷 OdontoGame
+        OdontoGame
       </header>
 
       {/* CONTEÚDO CENTRAL */}
