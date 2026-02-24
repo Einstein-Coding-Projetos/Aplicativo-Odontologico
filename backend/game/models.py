@@ -12,6 +12,22 @@ class Crianca(models.Model):
 
     def __str__(self):
         return self.nome
+    
+    def calcular_score_questionario(self) -> int:
+        from questions.models import Resposta
+
+        total = 0
+        respostas = Resposta.objects.filter(crianca=self).select_related("alternativa")
+
+        for r in respostas:
+            if r.alternativa_id is not None:
+                total += (r.alternativa.pontos or 0)
+
+        return total
+    
+    def resultado_questionario(self) -> str:
+        score = self.calcular_score_questionario()
+        return "DENTES BRILHANDO" if score >= 9 else "CUIDADO"
 
 
 class PerfilEducacional(models.Model):
