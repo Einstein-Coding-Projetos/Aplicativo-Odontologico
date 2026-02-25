@@ -11,8 +11,9 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [erro, setErro] = useState("");
+  const [loading, setLoading] = useState(false);  // Para controlar a tela de carregamento
 
-  // piscar junto
+  // Piscar junto
   const [isBlinking, setIsBlinking] = useState(false);
 
   async function handleLogin() {
@@ -23,20 +24,31 @@ export default function Login() {
       return;
     }
 
+    setLoading(true);  // Mostrar a tela de carregamento enquanto processa
+
     try {
       await login(username, password);
-      navigate("/home");
+      
+      // Aguarda alguns segundos antes de ir para a página de Home
+      setTimeout(() => {
+        navigate("/carregamento");  // Direciona para a página de carregamento
+        setTimeout(() => {
+          navigate("/home");  // Depois de um tempo, vai para a página home
+        }, 3000);  // 3 segundos no carregamento (ajuste conforme necessário)
+      }, 1000); // Aqui você pode ajustar o tempo de espera para ir para o carregamento
+
     } catch {
       setErro("Nome ou senha inválidos 💙");
+      setLoading(false);  // Esconde o carregamento se der erro
     }
   }
 
-  // ===== Pupila seguindo o mouse (mesmo max=10) =====
+  // ===== Pupila seguindo o mouse =====
   useEffect(() => {
     const tooth = toothRef.current;
     if (!tooth) return;
 
-    const max = 10; // mantém 10
+    const max = 10;
 
     const onMove = (e) => {
       const rect = tooth.getBoundingClientRect();

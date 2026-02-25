@@ -8,37 +8,37 @@ export default function PrivateLayout() {
   const location = useLocation();
 
   useEffect(() => {
-  function verificarNotificacao() {
-    const notif = localStorage.getItem("notificacao_personagem");
-    setTemNotificacao(notif === "true");
-  }
+    function verificarNotificacao() {
+      const notif = localStorage.getItem("notificacao_personagem");
+      setTemNotificacao(notif === "true");
+    }
 
-  verificarNotificacao();
+    verificarNotificacao();
 
-  window.addEventListener("storage", verificarNotificacao);
+    window.addEventListener("storage", verificarNotificacao);
 
-  return () => {
-    window.removeEventListener("storage", verificarNotificacao);
-  };
+    return () => {
+      window.removeEventListener("storage", verificarNotificacao);
+    };
   }, []);
 
   useEffect(() => {
-  const notif = localStorage.getItem("notificacao_personagem");
-  setTemNotificacao(notif === "true");
+    const notif = localStorage.getItem("notificacao_personagem");
+    setTemNotificacao(notif === "true");
   }, [location]);
 
   useEffect(() => {
-  function atualizar() {
-    const notif = localStorage.getItem("notificacao_personagem");
-    setTemNotificacao(notif === "true");
-  }
+    function atualizar() {
+      const notif = localStorage.getItem("notificacao_personagem");
+      setTemNotificacao(notif === "true");
+    }
 
-  window.addEventListener("notificacaoAtualizada", atualizar);
+    window.addEventListener("notificacaoAtualizada", atualizar);
 
-  return () => {
-    window.removeEventListener("notificacaoAtualizada", atualizar);
-  };
-}, []);
+    return () => {
+      window.removeEventListener("notificacaoAtualizada", atualizar);
+    };
+  }, []);
 
   return (
     <div style={{ 
@@ -91,16 +91,21 @@ export default function PrivateLayout() {
           alignItems: "center", 
           justifyContent: "space-between" 
         }}>
-            {/* Logo (Sem Emoji) */}
-            <div style={{ fontSize: "1.5rem", fontWeight: "800", color: "#0ea5e9" }}>
+            {/* Logo com fonte Baloo 2 */}
+            <div style={{ 
+              fontSize: "2.0rem", 
+              fontWeight: "800", 
+              color: "#0ea5e9",
+              fontFamily: "'Baloo 2', sans-serif"  // Alteração para Baloo 2
+            }}>
                 OdontoGame
             </div>
 
             {/* Menu Desktop (Horizontal) */}
             <nav className="nav-desktop" style={{ gap: "30px", alignItems: "center" }}>
                 <Link to="/home" style={navLinkStyle}>Home</Link>
-                <Link to="/questionario" style={navLinkStyle}>Questionário</Link>
                 <Link to="/jogo" style={navLinkStyle}>Jogo</Link>
+                <Link to="/questionario" style={navLinkStyle}>Questionário</Link>
                 <Link to="/ranking" style={navLinkStyle}>Ranking</Link>
                 <Link to="/perfil" style={navLinkStyle}>Perfil</Link>
                 <div style={{ position: "relative" }}>
@@ -153,8 +158,8 @@ export default function PrivateLayout() {
             }}>
                 <nav style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
                     <Link to="/home" onClick={() => setIsMenuOpen(false)} style={mobileNavLinkStyle}>Home</Link>
-                    <Link to="/questionario" onClick={() => setIsMenuOpen(false)} style={mobileNavLinkStyle}>Questionário</Link>
                     <Link to="/jogo" onClick={() => setIsMenuOpen(false)} style={mobileNavLinkStyle}>Jogo</Link>
+                    <Link to="/questionario" onClick={() => setIsMenuOpen(false)} style={mobileNavLinkStyle}>Questionário</Link>
                     <Link to="/ranking" onClick={() => setIsMenuOpen(false)} style={mobileNavLinkStyle}>Ranking</Link>
                     <Link to="/perfil" onClick={() => setIsMenuOpen(false)} style={mobileNavLinkStyle}>Perfil</Link>
                     <div style={{ position: "relative" }}>
@@ -215,10 +220,11 @@ export default function PrivateLayout() {
 // Estilos para os links
 const navLinkStyle = {
     textDecoration: "none",
-    color: "#64748b",
+    color: "#E15148",
     fontWeight: "600",
-    fontSize: "1rem",
-    transition: "color 0.2s"
+    fontSize: "1.4rem",
+    transition: "color 0.2s",
+    fontFamily: "'Baloo 2', sans-serif" // Alterando fonte para Baloo 2
 };
 
 const mobileNavLinkStyle = {
@@ -230,5 +236,6 @@ const mobileNavLinkStyle = {
     padding: "12px",
     borderRadius: "10px",
     backgroundColor: "#f1f5f9",
-    textAlign: "center"
+    textAlign: "center",
+    fontFamily: "'Baloo 2', sans-serif" // Alterando fonte para Baloo 2
 };

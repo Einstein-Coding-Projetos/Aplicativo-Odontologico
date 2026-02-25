@@ -10,6 +10,7 @@ import Perfil from "./pages/Perfil";
 import Register from "./pages/Register";
 import Ranking from "./pages/Ranking";
 import Personagens from "./pages/Personagens";
+import Carregamento from "./pages/Carregamento";  // Página de carregamento
 
 import PublicLayout from "./components/PublicLayout";
 import PrivateLayout from "./components/PrivateLayout";
@@ -23,6 +24,7 @@ function App() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/carregamento" element={<Carregamento />} /> {/* Rota de Carregamento */}
         </Route>
 
         {/* ROTAS PRIVADAS */}

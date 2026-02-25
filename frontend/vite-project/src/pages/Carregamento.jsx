@@ -1,0 +1,192 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import personagem1 from '../assets/monstro_transparente.png';  // Importando o personagem
+
+function Carregamento() {
+  const navigate = useNavigate();
+  const [progress, setProgress] = useState(0);
+  const [fraseAleatoria, setFraseAleatoria] = useState("");
+  const [dots, setDots] = useState(".");
+
+  // Array com frases aleatórias
+  const frases = [
+    "Quero ver você conseguir nos destruir!💣💥",
+    "Segura, já estamos quase lá!💡",
+    "Vamos ver se você é bom mesmo!👊💥",
+    "Uma grande jornada te aguarda!🥇"
+  ];
+
+  // Função para escolher uma frase aleatória
+  const escolherFrase = () => {
+    const frase = frases[Math.floor(Math.random() * frases.length)];
+    setFraseAleatoria(frase);
+  };
+
+  // Atualizando a frase a cada 3 segundos
+  useEffect(() => {
+    // Escolher a frase inicial
+    escolherFrase();
+
+    const intervalFrase = setInterval(() => {
+      escolherFrase();  // Escolher uma nova frase a cada 3 segundos
+    }, 3000);
+
+    return () => clearInterval(intervalFrase); // Limpeza do intervalo quando o componente desmontar
+  }, []);
+
+  // Para os três pontos dinâmicos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots((prev) => {
+        if (prev === "...") {
+          return ".";
+        }
+        return prev + ".";
+      });
+    }, 500); // Atualiza a cada 500ms
+
+    return () => clearInterval(interval); // Limpeza do intervalo
+  }, []);
+
+  useEffect(() => {
+    const duration = 5000;  // Total de 5 segundos
+    const increment = 100 / (duration / 100);  // Calcular quanto a barra vai aumentar a cada 100ms
+    
+    const interval = setInterval(() => {
+      setProgress((oldProgress) => {
+        if (oldProgress >= 100) {
+          clearInterval(interval);  // Para o intervalo quando chegar a 100%
+          navigate('/home');  // Redireciona para a home após 100%
+          return oldProgress;
+        }
+        return Math.min(oldProgress + increment, 100);  // Aumenta até 100%
+      });
+    }, 100); // Atualiza a cada 100ms
+
+    return () => clearInterval(interval);  // Limpeza do intervalo
+  }, [navigate]);
+
+  return (
+    <div className="carregamento-page">
+      <style>{css}</style>
+
+      <div className="wrap">
+        <header className="headline">
+          <h1>Carregando{dots}</h1>
+        </header>
+
+        <div className="progress-container">
+          <div className="progress-bar" style={{ width: `${progress}%` }} />
+        </div>
+
+        {/* Adicionando o personagem e a faixa para a frase */}
+        <div className="personagem-container">
+          <img src={personagem1} alt="Personagem" className="personagem-img" />
+          <div className="frase-faixa">
+            <p className="personagem-frase">{fraseAleatoria}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const css = `
+:root{
+  --blue: #4facfe;
+  --green: #00f2fe;
+  --amber: #E9B463;
+  --red: #E15148;
+  --ink: #0f172a;
+  --muted: rgba(255,255,255,0.85);
+}
+
+.carregamento-page{
+  min-height: 100vh;
+  width: 100vw;
+  background: #4facfe; 
+  display:flex;
+  justify-content:center;
+  padding: 42px 18px 60px;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  font-family: "Fredoka", "Quicksand", "Nunito", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+
+.wrap{
+  width: 100%;
+  max-width: 860px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap: 22px;
+}
+
+.headline{
+  text-align:center;
+  color: white;
+}
+
+.headline h1{
+  margin:20px 0 0;
+  font-family: "Baloo 2", system-ui, -apple-system, "Segoe UI", Arial, sans-serif !important;
+  font-size: clamp(44px, 6vw, 86px);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 0.95;
+}
+
+.headline p{
+  margin: 10px 0 0;
+  font-size: clamp(19px, 2.5vw, 22px);
+  font-weight: 300;
+  opacity: 0.95;
+}
+
+/* Barra de progresso */
+.progress-container {
+  width: 100%;
+  height: 50px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  margin-top: 40px;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #E15148;
+  border-radius: 5px;
+  transition: width 0.1s ease;
+}
+
+/* Estilo para o personagem */
+.personagem-container {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.personagem-img {
+  width: 400px;  /* Ajuste o tamanho conforme necessário */
+  height: auto;
+}
+
+/* Faixa de frase */
+.frase-faixa {
+  background-color: #E15148; /* Cor escura para a faixa */
+  width: 100%;  /* Pode ajustar a largura da faixa */
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 12px;
+  text-align: center;
+  position: relative;
+  color: white;
+  font-weight: 600;
+}
+
+.personagem-frase {
+  font-size: 22px;  /* Aumentando o tamanho da frase */
+  margin: 0;
+}
+`;
+
+export default Carregamento;
