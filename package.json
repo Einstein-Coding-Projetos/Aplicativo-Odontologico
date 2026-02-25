@@ -1,5 +1,15 @@
 {
+  "name": "Aplicativo-Odontologico",
+  "version": "1.0.0",
+  "lockfileVersion": 3,
+  "requires": true,
   "dependencies": {
-    "@mediapipe/tasks-vision": "^0.10.32"
+    "@mediapipe/tasks-vision": "^0.10.32",
+    "react-confetti": "^6.4.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
   }
 }
