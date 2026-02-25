@@ -7,16 +7,18 @@ __pycache__/
 *.log
 local_settings.py
 media/
+db.sqlite3
+
+# venv
+.venv/
+venv/
+backend/.venv/
 
 # Node / Frontend
 node_modules/
+frontend/node_modules/
 dist/
 .env
 
-__pycache__/
-*.pyc
-db.sqlite3
-node_modules/
-frontend/node_modules/
-.venv/
-venv/
+# Project-specific
+router/
