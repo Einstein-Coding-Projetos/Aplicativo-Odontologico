@@ -2,7 +2,7 @@ from django.db import models
 from game.models import Crianca
 from game.models import Crianca
 
-class TentativaMensal(models.Model):
+class Tentativa(models.Model):
     crianca = models.ForeignKey(Crianca, on_delete=models.CASCADE, related_name = "tentativas_questionario")
     ano = models.IntegerField()
     mes = models.IntegerField()
@@ -42,7 +42,7 @@ class Alternativa(models.Model):
 
 
 class Resposta(models.Model):
-    tentativa = models.ForeignKey(TentativaMensal, on_delete=models.CASCADE, related_name="respostas")
+    tentativa = models.ForeignKey(Tentativa, on_delete=models.CASCADE, related_name="respostas")
     pergunta = models.ForeignKey(Pergunta, on_delete=models.CASCADE)
     alternativa = models.ForeignKey(Alternativa, on_delete=models.CASCADE, null=True, blank=True)
     data = models.DateTimeField(auto_now_add=True)

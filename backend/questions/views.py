@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import permission_classes
-from .models import Pergunta, Resposta, Alternativa, TentativaQuestionario
+from .models import Pergunta, Resposta, Alternativa, Tentativa
 from game.models import Crianca
 from django.utils import timezone
 
@@ -19,7 +19,7 @@ def proxima_pergunta(request, crianca_id):
 
     crianca = Crianca.objects.get(id=crianca_id)
 
-    tentativa, _ = TentativaQuestionario.objects.get_or_create(
+    tentativa, _ = Tentativa.objects.get_or_create(
         crianca=crianca,
         ano=ano,
         mes=mes,
@@ -35,7 +35,7 @@ def proxima_pergunta(request, crianca_id):
         })
 
     respondidas = Resposta.objects.filter(
-        tentativ=tentativa
+        tentativa=tentativa
     ).values_list("pergunta_id", flat=True)
 
     pergunta = Pergunta.objects.exclude(
@@ -95,7 +95,7 @@ def responder_pergunta(request):
     ano, mes = agora.year, agora.month
 
     crianca = Crianca.objects.get(id=crianca_id)
-    tentativa, _ = TentativaQuestionario.objects.get_or_create(crianca=crianca, ano=ano, mes=mes)
+    tentativa, _ = Tentativa.objects.get_or_create(crianca=crianca, ano=ano, mes=mes)
 
     if tentativa.finalizado:
         return Response({"erro": "Questionário do mês já finalizado"}, status=403)
@@ -110,7 +110,7 @@ def responder_pergunta(request):
     )
 
     score = 0
-    for r in Resposta.objects.filter(tentativa=tentativa).select_related("alternativa":)
+    for r in Resposta.objects.filter(tentativa=tentativa).select_related("alternativa"):
         if r.alternativa_id is not None:
             score += (r.alternativa.pontos or 0)
     return Response({
@@ -125,7 +125,7 @@ def resultado_questionario(request, crianca_id):
     ano, mes = agora.year, agora.month
 
     crianca = Crianca.objects.get(id=crianca_id)
-    tentativa = TentativaQuestionario.objects.filter(crianca=crianca, ano=ano, mes=mes).first()
+    tentativa = Tentativa.objects.filter(crianca=crianca, ano=ano, mes=mes).first()
 
     if not tentativa:
         return Response({"erro": "Ainda não existe tentativa neste mês"}, status=404)
@@ -138,3 +138,9 @@ def resultado_questionario(request, crianca_id):
         "score": tentativa.score_total,
         "resultado": tentativa.resultado
     })
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def resultado_mes_atual(request, crianca_id):
+    # Reaproveita a mesma lógica do resultado do mês atual
+    return resultado_questionario(request, crianca_id)
