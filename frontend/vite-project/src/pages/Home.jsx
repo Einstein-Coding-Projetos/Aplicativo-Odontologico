@@ -1,209 +1,180 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react"; // Importando useState para controlar o hover
-import reinoImg from "../assets/reino.png"; // Imagem do Reino
-import monstrosCarie from "../assets/monstros_carie.png"; // Imagem dos monstros
-import denteDoce from "../assets/dente_doce.png"; // Imagem do dente doce
+import { useMemo, useState } from "react";
 
 function Home() {
   const navigate = useNavigate();
+  const [hoveredId, setHoveredId] = useState(null);
 
-  // Definindo o estado para controlar o hover
-  const [hovered, setHovered] = useState({
-    jogo: false,
-    questionario: false,
-    perfil: false,
-    ranking: false,
-    personagens: false,
-  });
+  const folders = useMemo(
+    () => [
+      // De trás -> pra frente (a ÚLTIMA fica na frente e embaixo)
+      { id: "ranking", label: "Ranking", route: "/ranking", color: "#8BA26E", tabText: "Ranking" },
+      { id: "perfil", label: "Perfil", route: "/perfil", color: "#B8B6D9", tabText: "Perfil" },
+      { id: "questionario", label: "Questionário", route: "/questionario", color: "#E9B463", tabText: "Questionário" },
+      { id: "personagens", label: "Personagens", route: "/personagens", color: "#00f2fe", tabText: "Personagens" },
+      { id: "jogo", label: "Jogo dos Germes", route: "/jogo", color: "#E15148", tabText: "Jogo dos Germes" }, // <- frente
+    ],
+    []
+  );
+
+  // Ajustes do empilhamento
+  const PEEK = 70; // quanto uma pasta "aparece" da outra (altura do “degrau”)
+  const FOLDER_H = 260; // altura de cada folder
+  const stackHeight = FOLDER_H + PEEK * (folders.length - 1) + 24;
+
+  // Ajustes da diagonal das abas
+  const TAB_BASE_LEFT = 56; // posição inicial
+  const TAB_STEP = 194; // quanto cada aba anda pro lado (diagonal)
 
   return (
     <div style={styles.container}>
-      {/* Slideshow com imagens lado a lado */}
-      <div style={styles.imageContainer}>
-        <div style={styles.imageWrapper}>
-          <img
-            src={monstrosCarie} // Imagem dos Monstros
-            alt="Monstros Carie"
-            style={styles.image}
-          />
-          <div
-            style={hovered.jogo ? { ...styles.linkBoxImage1, backgroundColor: "#E15148" } : styles.linkBoxImage1}
-            onClick={() => navigate("/jogo")}
-            onMouseEnter={() => setHovered({ ...hovered, jogo: true })}
-            onMouseLeave={() => setHovered({ ...hovered, jogo: false })}
-          >
-            Jogo dos Germes
-          </div>
-        </div>
-        <div style={styles.imageWrapper}>
-          <img
-            src={reinoImg} // Imagem do Reino
-            alt="Reino dos Dentes"
-            style={styles.image}
-          />
-          <div
-            style={hovered.questionario ? { ...styles.linkBoxImage2, backgroundColor: "#E15148" } : styles.linkBoxImage2}
-            onClick={() => navigate("/questionario")}
-            onMouseEnter={() => setHovered({ ...hovered, questionario: true })}
-            onMouseLeave={() => setHovered({ ...hovered, questionario: false })}
-          >
-            Questionário
-          </div>
-        </div>
-        <div style={styles.imageWrapper}>
-          <img
-            src={denteDoce} // Imagem do Dente Doce
-            alt="Dente Doce"
-            style={styles.image}
-          />
-          <div
-            style={hovered.perfil ? { ...styles.linkBoxImage3, backgroundColor: "#E15148" } : styles.linkBoxImage3}
-            onClick={() => navigate("/perfil")}
-            onMouseEnter={() => setHovered({ ...hovered, perfil: true })}
-            onMouseLeave={() => setHovered({ ...hovered, perfil: false })}
-          >
-            Perfil
-          </div>
-        </div>
-      </div>
-
-      {/* Adicionando os novos links: Ranking e Personagens */}
-      <div style={styles.linksContainer}>
-        <div
-          style={hovered.ranking ? { ...styles.linkBox, backgroundColor: "#E15148" } : styles.linkBox}
-          onClick={() => navigate("/ranking")}
-          onMouseEnter={() => setHovered({ ...hovered, ranking: true })}
-          onMouseLeave={() => setHovered({ ...hovered, ranking: false })}
-        >
-          Ranking
-        </div>
-        <div
-          style={hovered.personagens ? { ...styles.linkBox, backgroundColor: "#E15148" } : styles.linkBox}
-          onClick={() => navigate("/personagens")}
-          onMouseEnter={() => setHovered({ ...hovered, personagens: true })}
-          onMouseLeave={() => setHovered({ ...hovered, personagens: false })}
-        >
-          Personagens
-        </div>
-      </div>
-
-      {/* Menu Principal */}
       <h1 style={styles.title}>Menu Principal</h1>
+
+      <div style={{ ...styles.stack, height: stackHeight }}>
+        {folders.map((f, index) => {
+          const isHovered = hoveredId === f.id;
+
+          // backmost = index 0 (mais alto), frontmost = último (mais baixo)
+          const bottomBase = (folders.length - 1 - index) * PEEK;
+          const zBase = index;
+
+          return (
+            <div
+              key={f.id}
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate(f.route)}
+              onKeyDown={(e) => e.key === "Enter" && navigate(f.route)}
+              onMouseEnter={() => setHoveredId(f.id)}
+              onMouseLeave={() => setHoveredId(null)}
+              style={{
+                ...styles.folder,
+                background: f.color,
+                bottom: isHovered ? bottomBase + 125 : bottomBase, // hover sobe
+                zIndex: zBase,
+                transform: isHovered ? "translateY(-2px)" : "translateY(0px)",
+                boxShadow: isHovered
+                  ? "0 22px 0px rgba(0,0,0,0.22)"
+                  : "0 14px 26px rgba(0,0,0,0.15)",
+              }}
+            >
+              {/* ABA EM DIAGONAL */}
+              <div
+                style={{
+                  ...styles.tab,
+                  left: `${TAB_BASE_LEFT + index * TAB_STEP}px`,
+                }}
+              >
+                <span style={styles.tabText}>{f.tabText}</span>
+              </div>
+
+              <div style={styles.folderBody}>
+                <div style={styles.folderLabel}>{f.label}</div>
+                <div style={styles.folderHint}>Clique para abrir</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
 
 const styles = {
   container: {
-    background: "linear-gradient(to bottom, #4facfe, #00f2fe)", // Degradê de fundo
-    minHeight: "100vh", // Garantir que a altura seja 100% da tela
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center", // Para centralizar o conteúdo
-    fontFamily: "'Nunito', sans-serif", // Fonte usada na página
-    color: "#fff", // Cor do texto
-    padding: "20px",
-    position: "relative", // Necessário para o título ficar posicionado corretamente
-  },
-  imageContainer: {
-    display: "flex", // Faz com que as imagens fiquem lado a lado
-    gap: "20px", // Espaço entre as imagens
-    width: "100%", // Garante que ocupe toda a largura disponível
-    marginBottom: "20px", // Espaço entre a imagem e o menu
-    textAlign: "center", // Centraliza as imagens
-    overflow: "hidden", // Garante que as imagens não saiam da área
-    position: "relative", // Necessário para posicionamento dos links
-  },
-  imageWrapper: {
-    position: "relative", // Necessário para posicionar os links sobre as imagens
-    width: "30%", // Cada imagem ocupa 30% da largura
-  },
-  image: {
-    width: "100%", // Garantir que a imagem ocupe todo o espaço
-    height: "auto", // Mantém a proporção da imagem
-    borderRadius: "8px", // Bordas arredondadas
-    border: "5px solid #fff", // Borda branca mais destacada
-    boxShadow: "0 8px 15px rgba(0, 0, 0, 0.2)", // Sombra bonita para a imagem
-    opacity: 0.6, // Adicionando opacidade para tornar as imagens mais transparentes
-  },
-  linkBoxImage1: {
-    position: "absolute", // Posiciona o link sobre a imagem
-    top: "50%", // Coloca o link no meio da imagem
-    left: "50%",
-    transform: "translate(-50%, -50%)", // Para garantir que o link esteja centrado
-    backgroundColor: "rgba(255, 255, 255, 0.7)", // Fundo semitransparente
-    padding: "10px 20px", // Tamanho do link
-    fontSize: "1.8rem", // Aumentando o tamanho da fonte
-    fontWeight: "700", // Negrito no texto
-    borderRadius: "25px", // Bordas arredondadas
-    cursor: "pointer",
-    textAlign: "center",
-    width: "auto", // Largura ajustável
-    textShadow: "2px 2px 5px rgba(0, 0, 0, 0.7)", // Adicionando sombra ao texto
-    transition: "background-color 0.3s, color 0.3s", // Transição para a cor de fundo ao passar o mouse
-  },
-  linkBoxImage2: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    backgroundColor: "rgba(255, 255, 255, 0.7)",
-    padding: "10px 20px",
-    fontSize: "1.8rem", // Aumentando o tamanho da fonte
-    fontWeight: "700",
-    borderRadius: "25px",
-    cursor: "pointer",
-    textAlign: "center",
-    width: "auto",
-    textShadow: "2px 2px 5px rgba(0, 0, 0, 0.7)", // Adicionando sombra ao texto
-    transition: "background-color 0.3s, color 0.3s", // Transição para a cor de fundo ao passar o mouse
-  },
-  linkBoxImage3: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    backgroundColor: "rgba(255, 255, 255, 0.7)",
-    padding: "10px 20px",
-    fontSize: "1.8rem", // Aumentando o tamanho da fonte
-    fontWeight: "700",
-    borderRadius: "25px",
-    cursor: "pointer",
-    textAlign: "center",
-    width: "auto",
-    textShadow: "2px 2px 5px rgba(0, 0, 0, 0.7)", // Adicionando sombra ao texto
-    transition: "background-color 0.3s, color 0.3s", // Transição para a cor de fundo ao passar o mouse
-  },
-
-  // Efeito hover para Ranking e Personagens
-  linkBox: {
-    backgroundColor: "rgba(255, 255, 255, 0.7)", // Fundo semitransparente
-    padding: "10px 20px", // Tamanho do link
-    fontSize: "1.8rem", // Aumentando o tamanho da fonte
-    fontWeight: "700",
-    borderRadius: "25px", // Bordas arredondadas
-    cursor: "pointer",
-    textAlign: "center",
-    width: "auto",
-    textShadow: "2px 2px 5px rgba(0, 0, 0, 0.7)",
-    transition: "background-color 0.3s, color 0.3s",
-  },
-  linksContainer: {
-    display: "flex",
-    gap: "30px", // Espaço entre os links
-    marginTop: "20px", // Espaço acima dos links
+    background: "#4facfe",
+    minHeight: "100vh",
+    position: "relative",
+    fontFamily: "'Nunito', sans-serif",
+    color: "#fff",
+    overflow: "hidden",
   },
 
   title: {
+  position: "absolute",
+  top: "10px",
+  left: "40px",
+  fontSize: "4.2rem", // pode ajustar
+  fontWeight: 900,
+  zIndex: 20,
+  color: "rgba(255,255,255,0.95)",
+  textShadow: "0 4px 0 rgba(0,0,0,0.18), 0 14px 22px rgba(0,0,0,0.18)",
+},
+
+  // Pilha: largura quase total e colada embaixo
+  stack: {
     position: "absolute",
-    top: "40px", // Coloca o título mais perto do topo
-    left: "40px", // Coloca o título mais à esquerda
-    fontSize: "4rem", // Tamanho grande para o título
-    fontWeight: "800", // Título em negrito
-    color: "#fff", // Cor do título
-    zIndex: 10, // Garante que o título esteja acima de outros elementos
-    fontFamily: "'Nunito', sans-serif", // Adicionando a fonte ao título
+    left: "24px",
+    right: "24px",
+    bottom: "45px",
+    margin: "0 auto",
+  },
+
+  folder: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    height: "260px",
+    borderRadius: "18px",
+    background: "rgba(255,255,255,0.18)",
+    boxShadow: "0 8px 0 rgba(255,255,255,0.12), 0 12px 18px rgba(0,0,0,0.15)",
+    cursor: "pointer",
+    userSelect: "none",
+    transition: "transform 180ms ease, bottom 180ms ease, box-shadow 180ms ease",
+    border: "8px solid rgba(255,255,255,0.55)",
+
+    // textura leve tipo “papel”
+    backgroundImage: "none",
+    backgroundBlendMode: "normal",
+  },
+
+  tab: {
+    position: "absolute",
+    top: "-16px",
+    height: "40px",
+    width: "160px",
+    borderRadius: "14px 14px 6px 6px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    border: "5px solid rgba(255,255,255,0.55)",
+    borderBottom: "none",
+    background: "rgba(0,0,0,0.12)",
+    boxShadow: "0 10px 18px rgba(0,0,0,0.10)",
+    backdropFilter: "blur(3px)",
+  },
+
+  tabText: {
+    fontSize: "1.05rem",
+    fontWeight: 800,
+    color: "rgba(255,255,255,0.9)",
+    textTransform: "lowercase",
+    letterSpacing: "0.5px",
+    textShadow: "0 2px 6px rgba(0,0,0,0.25)",
+  },
+
+  folderBody: {
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    padding: "40px 48px 28px 48px",
+    gap: "10px",
+  },
+
+  folderLabel: {
+    fontSize: "3.6rem",
+    fontWeight: 900,
+    lineHeight: 1.05,
+    color: "rgba(255,255,255,0.92)",
+    textShadow: "0 4px 0 rgba(0,0,0,0.18), 0 14px 22px rgba(0,0,0,0.18)",
+  },
+
+  folderHint: {
+    fontSize: "1.2rem",
+    fontWeight: 700,
+    color: "rgba(255,255,255,0.75)",
+    textShadow: "0 4px 12px rgba(0,0,0,0.20)",
   },
 };
 
