@@ -24,46 +24,42 @@ function Carregamento() {
 
   // Atualizando a frase a cada 3 segundos
   useEffect(() => {
-    // Escolher a frase inicial
     escolherFrase();
-
     const intervalFrase = setInterval(() => {
-      escolherFrase();  // Escolher uma nova frase a cada 3 segundos
+      escolherFrase();
     }, 3000);
 
-    return () => clearInterval(intervalFrase); // Limpeza do intervalo quando o componente desmontar
+    return () => clearInterval(intervalFrase);
   }, []);
 
   // Para os três pontos dinâmicos
   useEffect(() => {
     const interval = setInterval(() => {
       setDots((prev) => {
-        if (prev === "...") {
-          return ".";
-        }
+        if (prev === "...") return ".";
         return prev + ".";
       });
-    }, 500); // Atualiza a cada 500ms
+    }, 500);
 
-    return () => clearInterval(interval); // Limpeza do intervalo
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
     const duration = 5000;  // Total de 5 segundos
-    const increment = 100 / (duration / 100);  // Calcular quanto a barra vai aumentar a cada 100ms
-    
+    const increment = 100 / (duration / 100);
+
     const interval = setInterval(() => {
       setProgress((oldProgress) => {
         if (oldProgress >= 100) {
-          clearInterval(interval);  // Para o intervalo quando chegar a 100%
-          navigate('/home');  // Redireciona para a home após 100%
+          clearInterval(interval);
+          navigate('/home');
           return oldProgress;
         }
-        return Math.min(oldProgress + increment, 100);  // Aumenta até 100%
+        return Math.min(oldProgress + increment, 100);
       });
-    }, 100); // Atualiza a cada 100ms
+    }, 100);
 
-    return () => clearInterval(interval);  // Limpeza do intervalo
+    return () => clearInterval(interval);
   }, [navigate]);
 
   return (
@@ -134,6 +130,9 @@ const css = `
   font-weight: 700;
   letter-spacing: 0.5px;
   line-height: 0.95;
+/* >>> sombras estilo “cartoon” (igual as que estávamos usando) */
+  color: rgba(255,255,255,0.95);
+  text-shadow: 0 4px 0 rgba(0,0,0,0.18), 0 14px 22px rgba(0,0,0,0.18);
 }
 
 .headline p{
@@ -143,19 +142,28 @@ const css = `
   opacity: 0.95;
 }
 
-/* Barra de progresso */
+/* Barra de progresso (com borda estilo cartoon) */
 .progress-container {
   width: 100%;
   height: 50px;
-  background-color: #f0f0f0;
-  border-radius: 5px;
+
+  background: rgba(255,255,255,0.92);
+  border-radius: 18px;
+
+  border: 5px solid rgba(255,255,255,0.18);
+  box-shadow: 0 10px 0 rgba(0,0,0,0.12), 0 18px 26px rgba(0,0,0,0.14);
+
   margin-top: 40px;
+  overflow: hidden; /* importante pra barra ficar “dentro” arredondada */
 }
 
 .progress-bar {
   height: 100%;
   background-color: #E15148;
-  border-radius: 5px;
+
+  border-radius: 12px; /* menor que a de fora */
+  box-shadow: inset 0 6px 0 rgba(255,255,255,0.20);
+
   transition: width 0.1s ease;
 }
 
@@ -166,14 +174,14 @@ const css = `
 }
 
 .personagem-img {
-  width: 400px;  /* Ajuste o tamanho conforme necessário */
+  width: 400px;
   height: auto;
 }
 
 /* Faixa de frase */
 .frase-faixa {
-  background-color: #E15148; /* Cor escura para a faixa */
-  width: 100%;  /* Pode ajustar a largura da faixa */
+  background-color: #E15148;
+  width: 100%;
   margin-top: 10px;
   padding: 10px;
   border-radius: 12px;
@@ -184,7 +192,7 @@ const css = `
 }
 
 .personagem-frase {
-  font-size: 22px;  /* Aumentando o tamanho da frase */
+  font-size: 22px;
   margin: 0;
 }
 `;

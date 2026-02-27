@@ -83,7 +83,7 @@ export default function PrivateLayout() {
         zIndex: 50 
       }}>
         <div style={{ 
-          maxWidth: "1200px", 
+          maxWidth: "1290px", 
           margin: "0 auto", 
           padding: "0 20px", 
           height: "70px", 
@@ -93,7 +93,7 @@ export default function PrivateLayout() {
         }}>
             {/* Logo com fonte Baloo 2 */}
             <div style={{ 
-              fontSize: "2.0rem", 
+              fontSize: "2rem", 
               fontWeight: "800", 
               color: "#0ea5e9",
               fontFamily: "'Baloo 2', sans-serif"  // Alteração para Baloo 2
@@ -194,9 +194,9 @@ export default function PrivateLayout() {
       <main style={{ 
         flex: 1, 
         width: "100%", 
-        maxWidth: "1200px", 
-        margin: "0 auto", 
-        padding: "20px" 
+        maxWidth: "1500px", 
+        margin: "20 auto", 
+        padding: "0px" 
       }}>
         <Outlet />
       </main>
@@ -220,8 +220,8 @@ export default function PrivateLayout() {
 // Estilos para os links
 const navLinkStyle = {
     textDecoration: "none",
-    color: "#E15148",
-    fontWeight: "600",
+    color: "#878e9d",
+    fontWeight: "550",
     fontSize: "1.4rem",
     transition: "color 0.2s",
     fontFamily: "'Baloo 2', sans-serif" // Alterando fonte para Baloo 2

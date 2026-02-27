@@ -8,10 +8,10 @@ function Home() {
   const folders = useMemo(
     () => [
       // De trás -> pra frente (a ÚLTIMA fica na frente e embaixo)
-      { id: "ranking", label: "Ranking", route: "/ranking", color: "#8BA26E", tabText: "Ranking" },
-      { id: "perfil", label: "Perfil", route: "/perfil", color: "#B8B6D9", tabText: "Perfil" },
-      { id: "questionario", label: "Questionário", route: "/questionario", color: "#E9B463", tabText: "Questionário" },
       { id: "personagens", label: "Personagens", route: "/personagens", color: "#00f2fe", tabText: "Personagens" },
+      { id: "perfil", label: "Perfil", route: "/perfil", color: "#A855F7", tabText: "Perfil" },
+      { id: "ranking", label: "Ranking", route: "/ranking", color: "#8BA26E", tabText: "Ranking" },
+      { id: "questionario", label: "Questionário", route: "/questionario", color: "#E9B463", tabText: "Questionário" },
       { id: "jogo", label: "Jogo dos Germes", route: "/jogo", color: "#E15148", tabText: "Jogo dos Germes" }, // <- frente
     ],
     []
