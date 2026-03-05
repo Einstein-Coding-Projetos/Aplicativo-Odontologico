@@ -19,8 +19,5 @@ node_modules/
 frontend/node_modules/
 dist/
 
-# Environment variables
-.env
-
 # Project-specific
 router/
