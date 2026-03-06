@@ -8,7 +8,7 @@ export default function Questionario() {
 
   const [criancaId, setCriancaId] = useState(null);
   const [pergunta, setPergunta] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selecionada, setSelecionada] = useState(null);
   const [finalizado, setFinalizado] = useState(false);
   const [xpAnim, setXpAnim] = useState(false);
@@ -24,17 +24,37 @@ export default function Questionario() {
   }, []);
 
   // Buscar ID da criança
-  useEffect(() => {
-    async function fetchPerfil() {
+useEffect(() => {
+  async function fetchPerfil() {
+    try {
       const token = localStorage.getItem("access");
+      console.log("Token:", token);
+
       const res = await fetch("http://127.0.0.1:8000/api/game/obter-perfil/", {
         headers: { Authorization: `Bearer ${token}` }
       });
+
+      console.log("Status obter-perfil:", res.status);
+
       const data = await res.json();
+      console.log("Dados do perfil:", data);
+      console.log("ID da criança:", data.id);
+
+      if (!res.ok) {
+        console.error("Erro da API ao buscar perfil:", data);
+        setLoading(false);
+        return;
+      }
+
       setCriancaId(data.id);
+    } catch (err) {
+      console.error("Erro ao buscar perfil:", err);
+      setLoading(false);
     }
-    fetchPerfil();
-  }, []);
+  }
+
+  fetchPerfil();
+}, []);
 
   // Buscar próxima pergunta
   useEffect(() => {
@@ -44,13 +64,17 @@ export default function Questionario() {
       setLoading(true);
       try {
         const res = await api.get(`questions/proxima/${criancaId}/`);
+        console.log("Resposta da próxima pergunta:", res.data);
+        
         if (res.data.finalizado) {
           setFinalizado(true);
+          setPontosTotais(res.data.score || 0);
         } else {
+          console.log("Pergunta recebida:", res.data.pergunta);
           setPergunta(res.data.pergunta);
         }
       } catch (err) {
-        console.error(err);
+        console.error("Erro ao buscar pergunta:", err);
       } finally {
         setLoading(false);
       }
@@ -69,7 +93,7 @@ export default function Questionario() {
         alternativa_id: selecionada
       });
 
-      setPontosTotais(res.data.pontos_totais);
+      setPontosTotais(res.data.pontos_parcial);
       setXpAnim(true);
 
       setTimeout(() => {
@@ -138,6 +162,8 @@ export default function Questionario() {
       </div>
     );
   }
+
+  console.log("STATE pergunta:", pergunta);
 
   return (
     <div className="page-container">
@@ -244,9 +270,10 @@ const styles = `
 .alt-btn {
   padding: 15px;
   border-radius: 15px;
-  border: 2px solid #E5E7EB;
+  border: 2px solid #dfdfdf;
   background: white;
   font-weight: 700;
+  color: #374151;
   cursor: pointer;
   transition: 0.2s;
 }
