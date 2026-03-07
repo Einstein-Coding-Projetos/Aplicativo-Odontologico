@@ -50,7 +50,7 @@ def proxima_pergunta(request, crianca_id):
 
         tentativa.score_total = score
         
-        tentativa.resultado = "UAU" if score >= 9 else "CUIDADO"
+        tentativa.resultado = "UAU, DENTES BRILHANDO POR AQUI!" if score >= 9 else "CUIDADO! \n Parece que seus dentinhos estão meio tristes."
         tentativa.finalizado = True
         tentativa.save(update_fields=["score_total", "resultado", "finalizado"])
 

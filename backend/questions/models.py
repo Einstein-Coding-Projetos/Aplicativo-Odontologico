@@ -7,7 +7,7 @@ class Tentativa(models.Model):
     ano = models.IntegerField()
     mes = models.IntegerField()
     score_total = models.IntegerField(default=0)
-    resultado = models.CharField(max_length=30, default="")
+    resultado = models.CharField(max_length=120, default="")
     finalizado = models.BooleanField(default=False)
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)

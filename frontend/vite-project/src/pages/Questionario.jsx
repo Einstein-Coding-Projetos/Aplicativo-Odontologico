@@ -14,6 +14,7 @@ export default function Questionario() {
   const [xpAnim, setXpAnim] = useState(false);
   const [pontosTotais, setPontosTotais] = useState(0);
   const [progresso, setProgresso] = useState(0);
+  const [resultadoFinal, setResultadoFinal] = useState("");
 
   // Fonte Nunito
   useEffect(() => {
@@ -69,6 +70,7 @@ useEffect(() => {
         if (res.data.finalizado) {
           setFinalizado(true);
           setPontosTotais(res.data.score || 0);
+          setResultadoFinal(res.data.resultado || "");
         } else {
           console.log("Pergunta recebida:", res.data.pergunta);
           setPergunta(res.data.pergunta);
@@ -93,7 +95,7 @@ useEffect(() => {
         alternativa_id: selecionada
       });
 
-      setPontosTotais(res.data.pontos_parcial);
+      setPontosTotais(res.data.score_parcial);
       setXpAnim(true);
 
       setTimeout(() => {
@@ -150,12 +152,23 @@ useEffect(() => {
               {pontosTotais} XP
             </div>
 
+            <div style={{
+              textAlign: "center",
+              marginTop: "16px",
+              fontSize: "1.4rem",
+              fontWeight: "800",
+              color: resultadoFinal === "UAU, DENTES BRILHANDO POR AQUI!" ? "#10B981" : "#F59E0B",
+              whiteSpace: "pre-line"
+          }}>
+              {resultadoFinal}
+            </div>
+
             <p style={{
               textAlign: "center",
               marginTop: "10px",
               color: "#6B7280"
             }}>
-              Continue cuidando do seu sorriso! 🦷✨
+              Volte no mês que vem para brincar e responder de novo! 🦷✨
             </p>
           </div>
         </div>
@@ -210,7 +223,7 @@ useEffect(() => {
             Confirmar Resposta
           </button>
 
-          {xpAnim && <div className="xp-pop">+10 XP 🎉</div>}
+          {xpAnim && <div className="xp-pop">+ XP 🎉</div>}
         </div>
       </div>
     </div>
