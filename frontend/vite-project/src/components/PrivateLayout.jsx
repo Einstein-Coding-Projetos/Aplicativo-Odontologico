@@ -83,7 +83,7 @@ export default function PrivateLayout() {
         zIndex: 50 
       }}>
         <div style={{ 
-          maxWidth: "1290px", 
+          maxWidth: "1865px", 
           margin: "0 auto", 
           padding: "0 20px", 
           height: "70px", 
@@ -138,7 +138,7 @@ export default function PrivateLayout() {
                 style={{ 
                   background: "transparent", 
                   border: "none", 
-                  fontSize: "1.8rem", 
+                  fontSize: "3.0rem", 
                   cursor: "pointer", 
                   color: "#334155",
                   padding: "5px"
@@ -194,7 +194,7 @@ export default function PrivateLayout() {
       <main style={{ 
         flex: 1, 
         width: "100%", 
-        maxWidth: "1500px", 
+        maxWidth: "2000px", 
         margin: "20 auto", 
         padding: "0px" 
       }}>
@@ -222,7 +222,7 @@ const navLinkStyle = {
     textDecoration: "none",
     color: "#878e9d",
     fontWeight: "550",
-    fontSize: "1.4rem",
+    fontSize: "1.8rem",
     transition: "color 0.2s",
     fontFamily: "'Baloo 2', sans-serif" // Alterando fonte para Baloo 2
 };

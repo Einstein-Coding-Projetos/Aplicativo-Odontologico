@@ -3,8 +3,14 @@ import { AuthContext } from "../auth/AuthContext";
 import api from "../api/axios";
 import confetti from "canvas-confetti";
 
-export default function Questionario() {
+// ✅ IMPORTA OS PERSONAGENS (ajuste os paths se necessário)
+import dentista from "../assets/dentista_transparente.png";
+import rei from "../assets/rei_transparente.png";
+import principe from "../assets/principe_transparente.png";
+import fada from "../assets/fada_transparente.png";
+import monstro from "../assets/monstro_transparente.png";
 
+export default function Questionario() {
   const { user } = useContext(AuthContext);
 
   const [criancaId, setCriancaId] = useState(null);
@@ -16,6 +22,12 @@ export default function Questionario() {
   const [pontosTotais, setPontosTotais] = useState(0);
   const [progresso, setProgresso] = useState(0);
   const [resultadoFinal, setResultadoFinal] = useState("");
+
+  // ✅ LISTA DE PERSONAGENS + ESCOLHA DO PERSONAGEM DA PERGUNTA
+  const personagens = [rei, principe, dentista, fada, monstro];
+  const personagemAtual = pergunta
+    ? personagens[pergunta.id % personagens.length]
+    : personagens[0];
 
   // Fonte Nunito
   useEffect(() => {
@@ -32,12 +44,9 @@ export default function Questionario() {
       try {
         const token = localStorage.getItem("access");
 
-        const res = await fetch(
-          "http://127.0.0.1:8000/api/game/obter-perfil/",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const res = await fetch("http://127.0.0.1:8000/api/game/obter-perfil/", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         const data = await res.json();
         if (!res.ok) return;
@@ -90,14 +99,14 @@ export default function Questionario() {
         particleCount: 6,
         angle: 60,
         spread: 80,
-        origin: { x: 0 }
+        origin: { x: 0 },
       });
 
       confetti({
         particleCount: 6,
         angle: 120,
         spread: 80,
-        origin: { x: 1 }
+        origin: { x: 1 },
       });
 
       if (Date.now() < end) {
@@ -126,7 +135,6 @@ export default function Questionario() {
         setSelecionada(null);
         setProgresso((prev) => prev + 1);
       }, 900);
-
     } catch (err) {
       console.error(err);
     }
@@ -137,7 +145,9 @@ export default function Questionario() {
     return (
       <div className="page-container">
         <style>{styles}</style>
-        <h2 style={{ color: "#1f2937" }}>Carregando pergunta...</h2>
+        <h2 style={{ color: "#1f2937", fontWeight: 900 }}>
+          Carregando pergunta...
+        </h2>
       </div>
     );
   }
@@ -149,15 +159,18 @@ export default function Questionario() {
         <style>{styles}</style>
 
         <div className="card">
-          <h2 className="titulo">MISSÃO COMPLETA 🏆</h2>
+          <div className="card-header">
+            <h2 className="titulo">MISSÃO COMPLETA 🏆</h2>
+            <span className="subtitulo">Mandou bem demais!</span>
+          </div>
 
-          <div className="xp-final">{pontosTotais} XP</div>
-
-          <div className="resultado">{resultadoFinal}</div>
-
-          <p className="mensagem">
-            Volte no mês que vem para brincar novamente! 🦷
-          </p>
+          <div className="card-body">
+            <div className="xp-final">{pontosTotais} XP</div>
+            <div className="resultado">{resultadoFinal}</div>
+            <p className="mensagem">
+              Volte no mês que vem para brincar novamente! 🦷
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -168,184 +181,251 @@ export default function Questionario() {
       <style>{styles}</style>
 
       <div className="card">
-
-        <h2 className="titulo">Questionário</h2>
-
-        <div className="xp">XP: {pontosTotais}</div>
-
-        <div className="progress-bar">
-          <div
-            className="progress-fill"
-            style={{ width: `${(progresso % 5) * 20}%` }}
-          />
+        <div className="card-header">
+          <h2 className="titulo">Questionário</h2>
+          <span className="subtitulo">Hora de cuidar dos dentinhos!</span>
         </div>
 
-        <h3 className="pergunta">{pergunta?.texto}</h3>
+        <div className="card-body">
+          <div className="xp">XP: {pontosTotais}</div>
 
-        <div className="alternativas">
-          {pergunta?.alternativas.map((alt) => (
-            <button
-              key={alt.id}
-              onClick={() => setSelecionada(alt.id)}
-              className={`alt-btn ${
-                selecionada === alt.id ? "selected" : ""
-              }`}
-            >
-              {alt.texto}
-            </button>
-          ))}
+          <div className="progress-bar">
+            <div
+              className="progress-fill"
+              style={{ width: `${(progresso % 5) * 20}%` }}
+            />
+          </div>
+
+          {/* ✅ PERSONAGEM DA PERGUNTA (AQUI) */}
+          <div style={{ display: "flex", justifyContent: "center", marginTop: "16px" }}>
+            <img
+              src={personagemAtual}
+              alt="Personagem"
+              style={{
+                width: "160px",
+                height: "160px",
+                objectFit: "contain",
+                filter: "drop-shadow(0 14px 22px rgba(0,0,0,0.18))",
+                userSelect: "none",
+                pointerEvents: "none",
+              }}
+              draggable={false}
+            />
+          </div>
+
+          <h3 className="pergunta">{pergunta?.texto}</h3>
+
+          <div className="alternativas">
+            {pergunta?.alternativas.map((alt) => (
+              <button
+                key={alt.id}
+                onClick={() => setSelecionada(alt.id)}
+                className={`alt-btn ${selecionada === alt.id ? "selected" : ""}`}
+              >
+                {alt.texto}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={enviarResposta}
+            disabled={!selecionada}
+            className="confirmar-btn"
+          >
+            Confirmar Resposta
+          </button>
+
+          {xpAnim && <div className="xp-pop">+XP ⭐</div>}
         </div>
-
-        <button
-          onClick={enviarResposta}
-          disabled={!selecionada}
-          className="confirmar-btn"
-        >
-          Confirmar Resposta
-        </button>
-
-        {xpAnim && <div className="xp-pop">+XP ⭐</div>}
-
       </div>
     </div>
   );
 }
 
 const styles = `
+:root{
+  --amber: #E9B463;
+  --amberDark: #B07D2A;
+  --red: #E15148;
+  --cyan: #00f2fe;
+  --ink: #0f172a;
+}
 
 .page-container {
-  min-height:100vh;
-  background:linear-gradient(180deg,#FDE68A,#FCD34D,#E9B463);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-family:'Nunito',sans-serif;
+  min-height: 100vh;
+  width: 100vw;
+  background: var(--amber);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Nunito', sans-serif;
+  padding: 18px;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  box-sizing: border-box;
 }
 
 .card{
-  width:90%;
-  max-width:850px;
-  background:#E9B463;
-  border-radius:22px;
-  padding:40px;
-  border:8px solid rgba(255,255,255,0.55);
-  box-shadow:0 12px 18px rgba(0,0,0,0.15);
+  width: 90%;
+  max-width: 850px;
+  background: rgba(255,255,255,0.20);
+  border-radius: 34px;
+  padding: 0;
+  overflow: hidden;
+  border: 6px solid rgba(255,255,255,0.55);
+  box-shadow: 0 16px 0 rgba(255,255,255,0.12), 0 26px 50px rgba(0,0,0,0.18);
+  box-sizing: border-box;
+  backdrop-filter: blur(6px);
+}
+
+.card-header{
+  background: var(--amberDark);
+  padding: 22px 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .titulo{
-  font-size:3rem;
-  font-weight:900;
-  text-align:center;
-  color:#ffffff;
-  text-shadow:0 4px 0 rgba(0,0,0,0.18);
+  margin: 0;
+  font-size: 2.6rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.14), 0 6px 0px rgba(0,0,0,0.14);
+  text-align: left;
+}
+
+.subtitulo{
+  font-weight: 800;
+  color: rgba(255,255,255,0.95);
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.card-body{
+  background: rgba(255,255,255,0.92);
+  padding: 30px 40px 40px;
+  box-sizing: border-box;
 }
 
 .xp{
-  text-align:center;
-  margin-top:10px;
-  font-size:1.2rem;
-  font-weight:800;
-  color:#ffffff;
+  text-align: center;
+  margin-top: 6px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: rgba(15,23,42,0.75);
 }
 
 .pergunta{
-  font-size:1.6rem;
-  margin-top:30px;
-  font-weight:800;
-  text-align:center;
-  color:#1f2937;
+  font-size: 1.6rem;
+  margin-top: 18px;
+  font-weight: 900;
+  text-align: center;
+  color: #1f2937;
 }
 
 .alternativas{
-  margin-top:25px;
-  display:flex;
-  flex-direction:column;
-  gap:15px;
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .alt-btn{
-  padding:16px;
-  border-radius:16px;
-  border:4px solid rgba(255,255,255,0.6);
-  font-weight:700;
-  font-size:1rem;
-  cursor:pointer;
-  background:white;
-  color:#1f2937;
-  transition:0.2s;
+  padding: 16px;
+  border-radius: 16px;
+  border: 4px solid rgba(0,0,0,0.06);
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  background: white;
+  color: #1f2937;
+  transition: 0.2s;
+  box-shadow: 0 8px 14px rgba(0,0,0,0.06);
 }
 
 .alt-btn:hover{
-  transform:scale(1.03);
-  background:#f8fafc;
+  transform: translateY(-1px) scale(1.01);
+  background: #f8fafc;
 }
 
 .alt-btn.selected{
-  background:#00f2fe;
-  color:#0f172a;
-  border-color:#ffffff;
+  background: #4facfe;
+  color: var(--ink);
+  border-color: rgba(255,255,255,0.85);
 }
 
 .confirmar-btn{
-  margin-top:30px;
-  padding:16px;
-  font-weight:800;
-  border-radius:16px;
-  border:none;
-  background:#E15148;
-  color:white;
-  font-size:1.1rem;
-  cursor:pointer;
+  margin-top: 26px;
+  padding: 16px;
+  font-weight: 900;
+  border-radius: 16px;
+  border: none;
+  background: var(--red);
+  color: white;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 0 10px 18px rgba(0,0,0,0.12);
 }
 
 .confirmar-btn:disabled{
-  background:#fca5a5;
-  cursor:not-allowed;
+  background: #fca5a5;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 .progress-bar{
-  width:100%;
-  height:10px;
-  background:rgba(255,255,255,0.4);
-  border-radius:20px;
-  margin-top:20px;
+  width: 100%;
+  height: 10px;
+  background: rgba(0,0,0,0.06);
+  border-radius: 20px;
+  margin-top: 16px;
+  overflow: hidden;
 }
 
 .progress-fill{
-  height:100%;
-  background:#00f2fe;
-  border-radius:20px;
-  transition:width .4s ease;
+  height: 100%;
+  background: #4facfe;
+  border-radius: 20px;
+  transition: width .4s ease;
 }
 
 .xp-pop{
-  text-align:center;
-  margin-top:15px;
-  font-size:1.4rem;
-  font-weight:800;
-  color:#ffffff;
+  text-align: center;
+  margin-top: 14px;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: rgba(15,23,42,0.75);
 }
 
 .xp-final{
-  font-size:3rem;
-  font-weight:900;
-  text-align:center;
-  color:#ffffff;
-  margin-top:30px;
+  font-size: 5rem;
+  font-weight: 900;
+  text-align: center;
+  color: rgba(15,23,42,0.85);
+  margin-top: 18px;
 }
 
 .resultado{
-  text-align:center;
-  margin-top:20px;
-  font-size:1.4rem;
-  font-weight:800;
-  color:#1f2937;
+  text-align: center;
+  margin-top: 18px;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #1f2937;
 }
 
 .mensagem{
-  text-align:center;
-  margin-top:15px;
-  color:#374151;
+  text-align: center;
+  margin-top: 14px;
+  color: #374151;
+  font-weight: 700;
 }
 
+@media (max-width: 560px){
+  .subtitulo{ display:none; }
+  .card-body{ padding: 26px; }
+  .titulo{ font-size: 2.1rem; }
+  .pergunta{ font-size: 1.25rem; }
+}
 `;

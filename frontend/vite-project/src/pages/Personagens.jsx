@@ -23,9 +23,9 @@ export default function Personagens() {
     "rei_transparente.png": rei,
   };
 
-  // Buscar criança
   useEffect(() => {
     localStorage.removeItem("notificacao_personagem");
+
     async function buscarCrianca() {
       const token = localStorage.getItem("access");
 
@@ -78,16 +78,12 @@ export default function Personagens() {
 
     if (response.ok) {
       setPersonagens((prev) =>
-        prev.map((p) =>
-          p.id === personagemId ? { ...p, desbloqueado: true } : p
-        )
+        prev.map((p) => (p.id === personagemId ? { ...p, desbloqueado: true } : p))
       );
 
       setAnimandoId(personagemId);
 
-      setTimeout(() => {
-        setMostrarConfete(true);
-      }, 800);
+      setTimeout(() => setMostrarConfete(true), 800);
 
       setTimeout(() => {
         setAnimandoId(null);
@@ -100,71 +96,24 @@ export default function Personagens() {
   async function ativar(personagemId) {
     const token = localStorage.getItem("access");
 
-    await fetch(
-      "http://127.0.0.1:8000/api/game/ativar_personagem/",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          crianca_id: criancaId,
-          personagem_id: personagemId,
-        }),
-      }
-    );
+    await fetch("http://127.0.0.1:8000/api/game/ativar_personagem/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        crianca_id: criancaId,
+        personagem_id: personagemId,
+      }),
+    });
 
     carregarPersonagens();
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#F3F4F6",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "20px",
-        fontFamily: "'Nunito', sans-serif",
-      }}
-    >
-      {/* ANIMAÇÃO IGUAL PERFIL */}
-      <style>{`
-        @keyframes slideUpFade {
-          from { opacity: 0; transform: translateY(40px) scale(0.95); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        @keyframes unlockAnim {
-          0% { transform: scale(1) rotate(0deg); opacity: 1; }
-          50% { transform: scale(1.4) rotate(-20deg); }
-          100% { transform: scale(0); opacity: 0; }
-        }
-
-        @keyframes glowBlue {
-          0% { opacity: 0; transform: scale(0.8); }
-          50% { opacity: 1; transform: scale(1.2); }
-          100% { opacity: 0; transform: scale(1.4); }
-        }
-
-        @keyframes bounceUnlock {
-          0% { transform: scale(0.8); }
-          50% { transform: scale(1.15); }
-          100% { transform: scale(1); }
-        }
-
-        .personagens-card {
-          width: 100%;
-          max-width: 900px;
-          background-color: #fff;
-          border-radius: 35px;
-          box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
-          overflow: hidden;
-          animation: slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-      `}</style>
+    <div className="personagens-page">
+      <style>{css}</style>
 
       {mostrarConfete && (
         <Confetti
@@ -183,169 +132,62 @@ export default function Personagens() {
       )}
 
       <div className="personagens-card">
-        <div
-          style={{
-            background: "linear-gradient(135deg, #4facfe, #00f2fe)",
-            padding: "30px",
-            color: "white",
-            textAlign: "center",
-          }}
-        >
-          <h1 style={{ margin: 0, fontWeight: "800" }}>
-            👑 Escolha seu herói!
-          </h1>
+        <div className="card-header">
+          <h1 className="card-title">Escolha seu herói!</h1>
+          <span className="card-subtitle"></span>
         </div>
 
-        <div style={{ padding: "30px" }}>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-              gap: "25px",
-            }}
-          >
+        <div className="card-body">
+          <div className="grid">
             {personagens.map((p) => (
-              <div
-                key={p.id}
-                style={{
-                  padding: "25px",
-                  borderRadius: "25px",
-                  backgroundColor: "#fff",
-                  border: p.ativo
-                    ? "3px solid #8B5CF6"
-                    : "1px solid #E5E7EB",
-                  position: "relative",
-                  textAlign: "center",
-                }}
-              >
+              <div key={p.id} className={`char-card ${p.ativo ? "active" : ""}`}>
                 {(!p.desbloqueado || animandoId === p.id) && (
                   <div
+                    className="lock"
                     style={{
-                      position: "absolute",
-                      top: "10px",
-                      right: "10px",
-                      fontSize: "26px",
                       animation:
-                        animandoId === p.id
-                          ? "unlockAnim 0.7s ease forwards"
-                          : "none",
+                        animandoId === p.id ? "unlockAnim 0.7s ease forwards" : "none",
                     }}
                   >
                     {animandoId === p.id ? "🔓" : "🔒"}
                   </div>
                 )}
 
-                <div
-                  style={{
-                    width: "140px",
-                    height: "140px",
-                    margin: "0 auto 15px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    position: "relative",
-                  }}
-                >
-                  {animandoId === p.id && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        width: "120px",
-                        height: "120px",
-                        borderRadius: "50%",
-                        background:
-                          "radial-gradient(circle, rgba(79,172,254,0.7) 0%, rgba(0,242,254,0.4) 40%, transparent 70%)",
-                        animation: "glowBlue 1.5s ease-out forwards",
-                      }}
-                    />
-                  )}
+                <div className="avatar">
+                  {animandoId === p.id && <div className="glow" />}
 
                   <img
                     src={imagens[p.asset_nome]}
+                    alt={p.nome}
                     style={{
-                      maxWidth: "100%",
-                      maxHeight: "100%",
-                      objectFit: "contain",
-                      filter: p.desbloqueado
-                        ? "none"
-                        : "grayscale(100%)",
-                      animation:
-                        animandoId === p.id
-                          ? "bounceUnlock 0.6s ease"
-                          : "none",
+                      filter: p.desbloqueado ? "none" : "grayscale(100%)",
+                      animation: animandoId === p.id ? "bounceUnlock 0.6s ease" : "none",
                     }}
                   />
                 </div>
 
-                <h3>{p.nome}</h3>
+                <h3 className="name">{p.nome}</h3>
 
                 {!p.desbloqueado && p.pode_desbloquear && (
-                  <button
-                    onClick={() => desbloquear(p.id)}
-                    style={{
-                      background:
-                        "linear-gradient(90deg, #8B5CF6, #6366F1)",
-                      color: "white",
-                      border: "none",
-                      padding: "10px 18px",
-                      borderRadius: "15px",
-                      fontWeight: "700",
-                      cursor: "pointer",
-                    }}
-                  >
+                  <button className="btn btn-purple" onClick={() => desbloquear(p.id)}>
                     Desbloquear
                   </button>
                 )}
 
                 {p.desbloqueado && !p.ativo && (
-                  <button
-                    onClick={() => ativar(p.id)}
-                    style={{
-                      background:
-                        "linear-gradient(90deg, #10B981, #34D399)",
-                      color: "white",
-                      border: "none",
-                      padding: "10px 18px",
-                      borderRadius: "15px",
-                      fontWeight: "700",
-                      cursor: "pointer",
-                    }}
-                  >
+                  <button className="btn btn-green" onClick={() => ativar(p.id)}>
                     Selecionar
                   </button>
                 )}
 
-                {p.ativo && (
-                  <div
-                    style={{
-                      marginTop: "10px",
-                      color: "#8B5CF6",
-                      fontWeight: "800",
-                    }}
-                  >
-                    ⭐ Ativo
-                  </div>
-                )}
+                {p.ativo && <div className="active-tag">⭐ Ativo</div>}
               </div>
             ))}
           </div>
 
-          <div style={{ textAlign: "center", marginTop: "40px" }}>
-            <button
-              onClick={() => navigate("/jogo")}
-              style={{
-                padding: "14px 30px",
-                borderRadius: "20px",
-                border: "none",
-                background:
-                  "linear-gradient(90deg, #4facfe, #00f2fe)",
-                color: "white",
-                fontWeight: "800",
-                fontSize: "1.5rem",
-                cursor: "pointer",
-              }}
-            >
-              🎮 Quero jogar de novo!
+          <div className="footer-cta">
+            <button className="cta" onClick={() => navigate("/jogo")}>
+              Quero jogar de novo!
             </button>
           </div>
         </div>
@@ -353,3 +195,195 @@ export default function Personagens() {
     </div>
   );
 }
+
+const css = `
+:root{
+  --green: #00f2fe;
+  --red: #E15148;
+  --ink: #0f172a;
+}
+
+/* BG sólido */
+.personagens-page{
+  min-height: 100vh;
+  width: 100vw;
+  background: var(--green);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding: 42px 18px 60px;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  font-family: "Nunito", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+
+/* animações */
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(40px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes unlockAnim {
+  0% { transform: scale(1) rotate(0deg); opacity: 1; }
+  50% { transform: scale(1.4) rotate(-20deg); }
+  100% { transform: scale(0); opacity: 0; }
+}
+@keyframes glowBlue {
+  0% { opacity: 0; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0; transform: scale(1.4); }
+}
+@keyframes bounceUnlock {
+  0% { transform: scale(0.8); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* CARD com “moldura” (borda cinza tipo print) */
+.personagens-card{
+  width: 100%;
+  max-width: 980px;
+  background-color: #fff;
+  border-radius: 34px;
+  overflow: hidden;
+  animation: slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  backdrop-filter: blur(6px);
+  
+  /* borda cinza externa */
+  border: 6px solid rgba(255,255,255,0.55);
+  box-shadow: 0 16px 0 rgba(255,255,255,0.12), 0 26px 50px rgba(0,0,0,0.18);
+  background: rgba(255,255,255,0.20);
+}
+
+/* header sólido */
+.card-header{
+  background: #158d94;
+  color: white;
+  padding: 22px 26px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+/* TÍTULO com sombra igual estilo do ranking */
+.card-title{
+  margin: 0;
+  font-family: "Nunito", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 2.2rem;
+
+  /* sombra “cartoon” */
+  text-shadow:
+    2px 2px 0 rgba(0,0,0,0.14), 0 6px 0px rgba(0,0,0,0.14);
+}
+
+.card-subtitle{
+  font-weight: 800;
+  opacity: 0.95;
+  font-size: clamp(12px, 1.3vw, 14px);
+  white-space: nowrap;
+}
+
+.card-body{
+padding: 30px; 
+background: rgba(255,255,255,0.92);
+border-top-left-radius: 3px;
+border-top-right-radius: 3px;
+padding: 30px;
+box-sizing: border-box;
+}
+
+/* grid */
+.grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 25px;
+}
+
+/* cards */
+.char-card{
+  padding: 25px;
+  border-radius: 25px;
+  background-color: #fff;
+  border: 1px solid #E5E7EB;
+  position: relative;
+  text-align: center;
+}
+.char-card.active{
+  border: 3px solid rgba(0, 184, 194, 0.9);
+}
+
+.lock{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 26px;
+}
+
+.avatar{
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 15px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position: relative;
+}
+.avatar img{
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.glow{
+  position:absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(79,172,254,0.7) 0%, rgba(0,242,254,0.4) 40%, transparent 70%);
+  animation: glowBlue 1.5s ease-out forwards;
+}
+
+.name{
+  margin: 6px 0 14px;
+  font-weight: 900;
+  color: rgba(15,23,42,0.85);
+}
+
+/* botões */
+.btn{
+  border: none;
+  padding: 10px 18px;
+  border-radius: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.btn-purple{ background: #6366F1; color: white; }
+.btn-green{ background: #10B981; color: white; }
+
+.active-tag{
+  margin-top: 10px;
+  color: #00b8c2;
+  font-weight: 900;
+}
+
+.footer-cta{
+  text-align:center;
+  margin-top: 40px;
+}
+.cta{
+  padding: 14px 30px;
+  border-radius: 20px;
+  border: none;
+  background: #158d94;
+  color: white;
+  font-weight: 900;
+  font-size: 1.5rem;
+  cursor: pointer;
+  font-family: "Nunito", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+.cta:hover{ background: var(--red); }
+
+@media (max-width: 560px){
+  .card-subtitle{ display:none; }
+}
+`;
