@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../auth/AuthContext";
 import api from "../api/axios";
+import confetti from "canvas-confetti";
 
 export default function Questionario() {
 
@@ -19,43 +20,36 @@ export default function Questionario() {
   // Fonte Nunito
   useEffect(() => {
     const link = document.createElement("link");
-    link.href = "https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap";
+    link.href =
+      "https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap";
     link.rel = "stylesheet";
     document.head.appendChild(link);
   }, []);
 
-  // Buscar ID da criança
-useEffect(() => {
-  async function fetchPerfil() {
-    try {
-      const token = localStorage.getItem("access");
-      console.log("Token:", token);
+  // Buscar perfil da criança
+  useEffect(() => {
+    async function fetchPerfil() {
+      try {
+        const token = localStorage.getItem("access");
 
-      const res = await fetch("http://127.0.0.1:8000/api/game/obter-perfil/", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+        const res = await fetch(
+          "http://127.0.0.1:8000/api/game/obter-perfil/",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
-      console.log("Status obter-perfil:", res.status);
+        const data = await res.json();
+        if (!res.ok) return;
 
-      const data = await res.json();
-      console.log("Dados do perfil:", data);
-      console.log("ID da criança:", data.id);
-
-      if (!res.ok) {
-        console.error("Erro da API ao buscar perfil:", data);
-        setLoading(false);
-        return;
+        setCriancaId(data.id);
+      } catch (err) {
+        console.error(err);
       }
-
-      setCriancaId(data.id);
-    } catch (err) {
-      console.error("Erro ao buscar perfil:", err);
-      setLoading(false);
     }
-  }
 
-  fetchPerfil();
-}, []);
+    fetchPerfil();
+  }, []);
 
   // Buscar próxima pergunta
   useEffect(() => {
@@ -63,20 +57,19 @@ useEffect(() => {
 
     async function fetchPergunta() {
       setLoading(true);
+
       try {
         const res = await api.get(`questions/proxima/${criancaId}/`);
-        console.log("Resposta da próxima pergunta:", res.data);
-        
+
         if (res.data.finalizado) {
           setFinalizado(true);
           setPontosTotais(res.data.score || 0);
           setResultadoFinal(res.data.resultado || "");
         } else {
-          console.log("Pergunta recebida:", res.data.pergunta);
           setPergunta(res.data.pergunta);
         }
       } catch (err) {
-        console.error("Erro ao buscar pergunta:", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -85,14 +78,44 @@ useEffect(() => {
     fetchPergunta();
   }, [criancaId, progresso]);
 
+  // 🎉 Confete quando terminar
+  useEffect(() => {
+    if (!finalizado) return;
+
+    const duration = 1500;
+    const end = Date.now() + duration;
+
+    const frame = () => {
+      confetti({
+        particleCount: 6,
+        angle: 60,
+        spread: 80,
+        origin: { x: 0 }
+      });
+
+      confetti({
+        particleCount: 6,
+        angle: 120,
+        spread: 80,
+        origin: { x: 1 }
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    };
+
+    frame();
+  }, [finalizado]);
+
   async function enviarResposta() {
-    if (!selecionada) return;
+    if (selecionada === null) return;
 
     try {
       const res = await api.post("questions/responder/", {
         crianca_id: criancaId,
         pergunta_id: pergunta.id,
-        alternativa_id: selecionada
+        alternativa_id: selecionada,
       });
 
       setPontosTotais(res.data.score_parcial);
@@ -101,7 +124,7 @@ useEffect(() => {
       setTimeout(() => {
         setXpAnim(false);
         setSelecionada(null);
-        setProgresso(prev => prev + 1);
+        setProgresso((prev) => prev + 1);
       }, 900);
 
     } catch (err) {
@@ -109,74 +132,36 @@ useEffect(() => {
     }
   }
 
-  // LOADING
+  // Loading
   if (loading) {
     return (
-      <div style={{
-        minHeight: "100vh",
-        background: "#F3F4F6",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        fontFamily: "Nunito",
-        fontWeight: "800",
-        color: "#8B5CF6"
-      }}>
-        Carregando pergunta...
+      <div className="page-container">
+        <style>{styles}</style>
+        <h2 style={{ color: "#1f2937" }}>Carregando pergunta...</h2>
       </div>
     );
   }
 
-  // TELA FINAL
+  // Tela final
   if (finalizado) {
     return (
       <div className="page-container">
         <style>{styles}</style>
 
         <div className="card">
-          <div className="header">
-            <h2>MISSÃO COMPLETA 🏆</h2>
-          </div>
+          <h2 className="titulo">MISSÃO COMPLETA 🏆</h2>
 
-          <div className="content">
-            <h3 style={{ textAlign: "center", marginBottom: "15px" }}>
-              Você ganhou:
-            </h3>
+          <div className="xp-final">{pontosTotais} XP</div>
 
-            <div style={{
-              fontSize: "3rem",
-              textAlign: "center",
-              fontWeight: "800",
-              color: "#10B981"
-            }}>
-              {pontosTotais} XP
-            </div>
+          <div className="resultado">{resultadoFinal}</div>
 
-            <div style={{
-              textAlign: "center",
-              marginTop: "16px",
-              fontSize: "1.4rem",
-              fontWeight: "800",
-              color: resultadoFinal === "UAU, DENTES BRILHANDO POR AQUI!" ? "#10B981" : "#F59E0B",
-              whiteSpace: "pre-line"
-          }}>
-              {resultadoFinal}
-            </div>
-
-            <p style={{
-              textAlign: "center",
-              marginTop: "10px",
-              color: "#6B7280"
-            }}>
-              Volte no mês que vem para brincar e responder de novo! 🦷✨
-            </p>
-          </div>
+          <p className="mensagem">
+            Volte no mês que vem para brincar novamente! 🦷
+          </p>
         </div>
       </div>
     );
   }
-
-  console.log("STATE pergunta:", pergunta);
 
   return (
     <div className="page-container">
@@ -184,158 +169,183 @@ useEffect(() => {
 
       <div className="card">
 
-        {/* HEADER */}
-        <div className="header">
-          <h2>Questionário</h2>
-          <div className="xp">XP: {pontosTotais}</div>
+        <h2 className="titulo">Questionário</h2>
+
+        <div className="xp">XP: {pontosTotais}</div>
+
+        <div className="progress-bar">
+          <div
+            className="progress-fill"
+            style={{ width: `${(progresso % 5) * 20}%` }}
+          />
         </div>
 
-        {/* CONTEÚDO */}
-        <div className="content">
+        <h3 className="pergunta">{pergunta?.texto}</h3>
 
-          {/* Barra de Progresso */}
-          <div className="progress-bar">
-            <div
-              className="progress-fill"
-              style={{ width: `${(progresso % 5) * 20}%` }}
-            />
-          </div>
-
-          <h3 className="pergunta">{pergunta?.texto}</h3>
-
-          <div className="alternativas">
-            {pergunta?.alternativas.map((alt) => (
-              <button
-                key={alt.id}
-                onClick={() => setSelecionada(alt.id)}
-                className={`alt-btn ${selecionada === alt.id ? "selected" : ""}`}
-              >
-                {alt.texto}
-              </button>
-            ))}
-          </div>
-
-          <button
-            onClick={enviarResposta}
-            disabled={!selecionada}
-            className="confirmar-btn"
-          >
-            Confirmar Resposta
-          </button>
-
-          {xpAnim && <div className="xp-pop">+ XP 🎉</div>}
+        <div className="alternativas">
+          {pergunta?.alternativas.map((alt) => (
+            <button
+              key={alt.id}
+              onClick={() => setSelecionada(alt.id)}
+              className={`alt-btn ${
+                selecionada === alt.id ? "selected" : ""
+              }`}
+            >
+              {alt.texto}
+            </button>
+          ))}
         </div>
+
+        <button
+          onClick={enviarResposta}
+          disabled={!selecionada}
+          className="confirmar-btn"
+        >
+          Confirmar Resposta
+        </button>
+
+        {xpAnim && <div className="xp-pop">+XP ⭐</div>}
+
       </div>
     </div>
   );
 }
 
 const styles = `
+
 .page-container {
-  min-height: 100vh;
-  background-color: #F3F4F6;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: 'Nunito', sans-serif;
+  min-height:100vh;
+  background:linear-gradient(180deg,#FDE68A,#FCD34D,#E9B463);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-family:'Nunito',sans-serif;
 }
 
-.card {
-  width: 100%;
-  min-height: 100vh;
-  background-color: #fff;
-  display: flex;
-  flex-direction: column;
+.card{
+  width:90%;
+  max-width:850px;
+  background:#E9B463;
+  border-radius:22px;
+  padding:40px;
+  border:8px solid rgba(255,255,255,0.55);
+  box-shadow:0 12px 18px rgba(0,0,0,0.15);
 }
 
-@media (min-width: 768px) {
-  .card {
-    max-width: 900px;
-    border-radius: 35px;
-    box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
-  }
+.titulo{
+  font-size:3rem;
+  font-weight:900;
+  text-align:center;
+  color:#ffffff;
+  text-shadow:0 4px 0 rgba(0,0,0,0.18);
 }
 
-.header {
-  background: linear-gradient(135deg, #4facfe, #00f2fe);
-  padding: 30px;
-  color: white;
-  text-align: center;
+.xp{
+  text-align:center;
+  margin-top:10px;
+  font-size:1.2rem;
+  font-weight:800;
+  color:#ffffff;
 }
 
-.content {
-  padding: 25px;
-  flex: 1;
+.pergunta{
+  font-size:1.6rem;
+  margin-top:30px;
+  font-weight:800;
+  text-align:center;
+  color:#1f2937;
 }
 
-.pergunta {
-  font-size: 1.2rem;
-  font-weight: 800;
-  margin-bottom: 20px;
+.alternativas{
+  margin-top:25px;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
 }
 
-.alternativas {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+.alt-btn{
+  padding:16px;
+  border-radius:16px;
+  border:4px solid rgba(255,255,255,0.6);
+  font-weight:700;
+  font-size:1rem;
+  cursor:pointer;
+  background:white;
+  color:#1f2937;
+  transition:0.2s;
 }
 
-.alt-btn {
-  padding: 15px;
-  border-radius: 15px;
-  border: 2px solid #dfdfdf;
-  background: white;
-  font-weight: 700;
-  color: #374151;
-  cursor: pointer;
-  transition: 0.2s;
+.alt-btn:hover{
+  transform:scale(1.03);
+  background:#f8fafc;
 }
 
-.alt-btn:hover {
-  background: #F3F4F6;
+.alt-btn.selected{
+  background:#00f2fe;
+  color:#0f172a;
+  border-color:#ffffff;
 }
 
-.alt-btn.selected {
-  border-color: #8B5CF6;
-  background: #F5F3FF;
-  color: #6D28D9;
+.confirmar-btn{
+  margin-top:30px;
+  padding:16px;
+  font-weight:800;
+  border-radius:16px;
+  border:none;
+  background:#E15148;
+  color:white;
+  font-size:1.1rem;
+  cursor:pointer;
 }
 
-.confirmar-btn {
-  margin-top: 25px;
-  padding: 15px;
-  background: linear-gradient(90deg, #8B5CF6, #6366F1);
-  border: none;
-  color: white;
-  font-weight: 800;
-  border-radius: 15px;
-  cursor: pointer;
+.confirmar-btn:disabled{
+  background:#fca5a5;
+  cursor:not-allowed;
 }
 
-.progress-bar {
-  width: 100%;
-  height: 8px;
-  background: #E5E7EB;
-  border-radius: 10px;
-  margin-bottom: 20px;
+.progress-bar{
+  width:100%;
+  height:10px;
+  background:rgba(255,255,255,0.4);
+  border-radius:20px;
+  margin-top:20px;
 }
 
-.progress-fill {
-  height: 100%;
-  background: #10B981;
-  border-radius: 10px;
-  transition: width 0.4s ease;
+.progress-fill{
+  height:100%;
+  background:#00f2fe;
+  border-radius:20px;
+  transition:width .4s ease;
 }
 
-.xp-pop {
-  margin-top: 15px;
-  font-weight: 800;
-  color: #10B981;
-  animation: pop 0.6s ease;
+.xp-pop{
+  text-align:center;
+  margin-top:15px;
+  font-size:1.4rem;
+  font-weight:800;
+  color:#ffffff;
 }
 
-@keyframes pop {
-  from { transform: scale(0); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+.xp-final{
+  font-size:3rem;
+  font-weight:900;
+  text-align:center;
+  color:#ffffff;
+  margin-top:30px;
 }
+
+.resultado{
+  text-align:center;
+  margin-top:20px;
+  font-size:1.4rem;
+  font-weight:800;
+  color:#1f2937;
+}
+
+.mensagem{
+  text-align:center;
+  margin-top:15px;
+  color:#374151;
+}
+
 `;

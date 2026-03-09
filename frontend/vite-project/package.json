@@ -12,6 +12,7 @@
   "dependencies": {
     "@mediapipe/tasks-vision": "^0.10.32",
     "axios": "^1.13.4",
+    "canvas-confetti": "^1.9.4",
     "react": "^19.2.0",
     "react-confetti": "^6.4.0",
     "react-dom": "^19.2.0",
