@@ -298,6 +298,32 @@ export default function Perfil() {
             width: 92%;
           }
         }
+
+        @media (max-width: 768px) {
+          .profile-card {
+            max-width: 100%;
+          }
+
+          .title {
+            font-size: 2.2rem;
+          }
+
+          .folderLabel {
+            font-size: 2rem;
+          }
+
+          .storyH2 {
+            font-size: 1.5rem;
+          }
+
+          .storyP {
+            font-size: 1rem;
+          }
+
+          .statBar {
+            width: 100%;
+          }
+        }
       `}</style>
 
       <div className="profile-card">
@@ -735,108 +761,6 @@ export default function Perfil() {
             >
               Fechar
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL EDIÇÃO */}
-      {showEdit && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(15,23,42,0.55)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000,
-            padding: 18,
-          }}
-          onClick={() => setShowEdit(false)}
-        >
-          <div
-            style={{
-              backgroundColor: "rgba(255,255,255,0.98)",
-              padding: "24px",
-              borderRadius: "24px",
-              maxWidth: "340px",
-              width: "100%",
-              textAlign: "center",
-              border: "4px solid rgba(15,23,42,0.14)",
-              boxShadow: BIG_CARD_SHADOW,
-              animation: "slideUpFade 0.3s ease-out",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3
-              style={{
-                color: "rgba(15,23,42,0.86)",
-                marginTop: 0,
-                fontSize: "1.35rem",
-                fontWeight: 1000,
-                textShadow: TITLE_SHADOW,
-              }}
-            >
-              {editType === "email" ? "Novo E-mail" : "Nova Senha"}
-            </h3>
-
-            <form onSubmit={handleUpdate}>
-              <input
-                name="valor"
-                type={editType === "senha" ? "password" : "email"}
-                placeholder={editType === "email" ? "Digite o novo e-mail" : "Digite a nova senha"}
-                required
-                style={{
-                  width: "100%",
-                  padding: "12px",
-                  margin: "15px 0",
-                  borderRadius: "16px",
-                  border: "4px solid rgba(15,23,42,0.12)",
-                  fontSize: "1rem",
-                  boxSizing: "border-box",
-                  fontWeight: 900,
-                  outline: "none",
-                }}
-              />
-
-              <div style={{ display: "flex", gap: "10px" }}>
-                <button
-                  type="button"
-                  onClick={() => setShowEdit(false)}
-                  style={{
-                    flex: 1,
-                    padding: "12px",
-                    backgroundColor: "rgba(15,23,42,0.06)",
-                    color: "rgba(15,23,42,0.75)",
-                    border: "4px solid rgba(15,23,42,0.12)",
-                    borderRadius: "16px",
-                    cursor: "pointer",
-                    fontWeight: 1000,
-                  }}
-                >
-                  Cancelar
-                </button>
-
-                <button
-                  type="submit"
-                  style={{
-                    flex: 1,
-                    padding: "12px",
-                    backgroundColor: "#10B981",
-                    color: "white",
-                    border: "4px solid rgba(15,23,42,0.12)",
-                    borderRadius: "16px",
-                    cursor: "pointer",
-                    fontWeight: 1000,
-                  }}
-                >
-                  Salvar
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}

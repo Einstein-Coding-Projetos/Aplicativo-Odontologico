@@ -405,6 +405,51 @@ const styles = {
     color: "rgba(255,255,255,0.75)",
     textShadow: "0 4px 12px rgba(0,0,0,0.20)",
   },
+
+  /* Media Queries - Responsividade */
+  "@media (max-width: 1024px)": {
+    container: {
+      paddingBottom: "100px", // Ajusta o padding para tablets
+    },
+  },
+
+  "@media (max-width: 768px)": {
+    title: {
+      fontSize: "3.5rem", // Ajusta o título
+    },
+
+    storyGrid: {
+      gridTemplateColumns: "1fr", // Muda a grid para uma coluna
+    },
+
+    storyCard: {
+      padding: "16px", // Ajusta o padding dos cards
+    },
+
+    storyBtnSolid: {
+      fontSize: "0.85rem", // Ajusta o botão para telas pequenas
+      padding: "10px 12px",
+    },
+  },
+
+  "@media (max-width: 560px)": {
+    title: {
+      fontSize: "2.5rem", // Diminui ainda mais o título
+    },
+
+    storyH2: {
+      fontSize: "2rem", // Ajusta o título da história
+    },
+
+    storyP: {
+      fontSize: "1rem", // Ajusta o texto da história
+    },
+
+    folderLabel: {
+      fontSize: "2.8rem", // Ajusta o tamanho do título do folder
+    },
+  },
 };
+
 
 export default Home;

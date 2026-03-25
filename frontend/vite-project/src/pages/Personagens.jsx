@@ -36,6 +36,10 @@ export default function Personagens() {
 
       const data = await response.json();
       setCriancaId(data.id);
+      // Armazena os pontos totais da criança no localStorage (se não estiver já)
+      if (data.pontos_totais) {
+        localStorage.setItem("pontos_totais", data.pontos_totais);
+      }
     }
 
     buscarCrianca();
@@ -58,38 +62,47 @@ export default function Personagens() {
     setPersonagens(Array.isArray(data) ? data : []);
   }
 
-  async function desbloquear(personagemId) {
+  // Desbloquear personagem (agora com a verificação dos pontos necessários)
+  async function desbloquear(personagemId, pontosNecessarios) {
     const token = localStorage.getItem("access");
 
-    const response = await fetch(
-      "http://127.0.0.1:8000/api/game/desbloquear-personagem/",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          crianca_id: criancaId,
-          personagem_id: personagemId,
-        }),
-      }
-    );
+    // Pega os pontos totais da criança no localStorage
+    const pontosTotais = parseInt(localStorage.getItem("pontos_totais") || 0);
 
-    if (response.ok) {
-      setPersonagens((prev) =>
-        prev.map((p) => (p.id === personagemId ? { ...p, desbloqueado: true } : p))
+    // Verifica se a criança tem pontos suficientes
+    if (pontosTotais >= pontosNecessarios) {
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/game/desbloquear-personagem/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            crianca_id: criancaId,
+            personagem_id: personagemId,
+          }),
+        }
       );
 
-      setAnimandoId(personagemId);
+      if (response.ok) {
+        setPersonagens((prev) =>
+          prev.map((p) => (p.id === personagemId ? { ...p, desbloqueado: true } : p))
+        );
 
-      setTimeout(() => setMostrarConfete(true), 800);
+        setAnimandoId(personagemId);
 
-      setTimeout(() => {
-        setAnimandoId(null);
-        setMostrarConfete(false);
-        carregarPersonagens();
-      }, 5000);
+        setTimeout(() => setMostrarConfete(true), 800);
+
+        setTimeout(() => {
+          setAnimandoId(null);
+          setMostrarConfete(false);
+          carregarPersonagens();
+        }, 5000);
+      }
+    } else {
+      alert("Você não tem pontos suficientes para desbloquear este personagem.");
     }
   }
 
@@ -168,19 +181,32 @@ export default function Personagens() {
 
                 <h3 className="name">{p.nome}</h3>
 
+                {/* Se o personagem não estiver desbloqueado e puder ser desbloqueado */}
                 {!p.desbloqueado && p.pode_desbloquear && (
-                  <button className="btn btn-purple" onClick={() => desbloquear(p.id)}>
+                  <button
+                    className="btn btn-purple"
+                    onClick={() => desbloquear(p.id, p.pontos_necessarios)}
+                  >
                     Desbloquear
                   </button>
                 )}
 
+                {/* Se o personagem estiver desbloqueado e não estiver ativo */}
                 {p.desbloqueado && !p.ativo && (
                   <button className="btn btn-green" onClick={() => ativar(p.id)}>
                     Selecionar
                   </button>
                 )}
 
+                {/* Se o personagem estiver ativo */}
                 {p.ativo && <div className="active-tag">⭐ Ativo</div>}
+
+                {/* Se o personagem estiver bloqueado */}
+                {!p.desbloqueado && (
+                  <button className="btn btn-blocked" disabled>
+                    Bloqueado
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -201,6 +227,7 @@ const css = `
   --green: #00f2fe;
   --red: #E15148;
   --ink: #0f172a;
+  --blocked-color: #D1D5DB;
 }
 
 /* BG sólido */
@@ -284,12 +311,12 @@ const css = `
 }
 
 .card-body{
-padding: 30px; 
-background: rgba(255,255,255,0.92);
-border-top-left-radius: 3px;
-border-top-right-radius: 3px;
-padding: 30px;
-box-sizing: border-box;
+  padding: 30px; 
+  background: rgba(255,255,255,0.92);
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  padding: 30px;
+  box-sizing: border-box;
 }
 
 /* grid */
@@ -359,6 +386,7 @@ box-sizing: border-box;
 }
 .btn-purple{ background: #6366F1; color: white; }
 .btn-green{ background: #10B981; color: white; }
+.btn-blocked{ background: var(--blocked-color); color: #6B7280; font-weight: 700; }
 
 .active-tag{
   margin-top: 10px;
@@ -387,3 +415,4 @@ box-sizing: border-box;
   .card-subtitle{ display:none; }
 }
 `;
+
