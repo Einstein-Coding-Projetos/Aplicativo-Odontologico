@@ -1,0 +1,245 @@
+[33mcommit 30297283c00753eb38099901541dba01ce944159[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Fri Mar 27 18:16:08 2026 -0300
+
+    socorro
+
+[33mcommit 1cdbf8127f63a799a5ef3c263d16a3a1c8bfa7d0[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Fri Mar 27 17:38:23 2026 -0300
+
+    correção para deploy
+
+[33mcommit 69149ed49c68922b97d9f89ddb1fa8cde36063fa[m
+Author: Henrique Machiaveli Martins <hnriquemartins1406@gmai.com>
+Date:   Fri Mar 27 17:16:31 2026 -0300
+
+    fix 6 error
+
+[33mcommit 2df2d3656671bfe34fb350d186d45363bb4dabbb[m
+Author: Henrique Machiaveli Martins <hnriquemartins1406@gmai.com>
+Date:   Fri Mar 27 17:01:44 2026 -0300
+
+    fix 5 error
+
+[33mcommit ac8f59da92b1d60cd5b9b675252d41ea6dcd58cf[m
+Author: Henrique Machiaveli Martins <hnriquemartins1406@gmai.com>
+Date:   Fri Mar 27 16:51:19 2026 -0300
+
+    fix 4 error 404 register
+
+[33mcommit a1ccec564b79f0765a8f8db7b0e9e9c41e742caa[m
+Author: Henrique Machiaveli Martins <hnriquemartins1406@gmai.com>
+Date:   Fri Mar 27 16:37:49 2026 -0300
+
+    fix 3 error 404 register
+
+[33mcommit ba513ebdcedc5a52d821392773a88d33991d9526[m
+Author: Henrique Machiaveli Martins <hnriquemartins1406@gmai.com>
+Date:   Fri Mar 27 16:31:13 2026 -0300
+
+    fix erro 404 register 2
+
+[33mcommit e56293381ec30047a0fcceaed73f5cf8ac5cdbcc[m
+Author: Henrique Machiaveli Martins <hnriquemartins1406@gmai.com>
+Date:   Fri Mar 27 16:16:39 2026 -0300
+
+    fix rotas register
+
+[33mcommit f89a6845ffd64a4cd9aaf03db706ead8cc00d3f9[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Fri Mar 27 14:40:45 2026 -0300
+
+    mais detalhes alterados
+
+[33mcommit b1ae8fcfa1c70d1f4b99a2e0191181025f355e3c[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Fri Mar 27 14:24:09 2026 -0300
+
+    correção dos fetchs
+
+[33mcommit 0f4c726372d842588363d096f12f6b0016176fc3[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Fri Mar 27 14:14:56 2026 -0300
+
+    tinha colocado o link errado
+
+[33mcommit 205b4e0b583c7736a04713bb2821ce2467f5aa8e[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Fri Mar 27 13:56:04 2026 -0300
+
+    adionei o url do back
+
+[33mcommit b96dd57fb0dd690f90bebf68fdcc2dd153f7bd73[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Fri Mar 27 00:40:12 2026 -0300
+
+    mais ajustes de erros encontrados após o deploy
+
+[33mcommit ae0d83154556172382de381d57f1c12dd8a0ad30[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Fri Mar 27 00:08:43 2026 -0300
+
+    mais ajustes pro deploy
+
+[33mcommit f2df36100413fa9e7d4e987e3fc00457b949a4c9[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Thu Mar 26 23:55:42 2026 -0300
+
+    mais ajustes socorro
+
+[33mcommit 79de2893c8a9c29cce6b8367b123ff4b32318f74[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Thu Mar 26 23:51:31 2026 -0300
+
+    mais ajustes
+
+[33mcommit e48655459c28c4576f33582309c86827f9a909b0[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Thu Mar 26 23:11:29 2026 -0300
+
+    ajustes para deploy
+
+[33mcommit d515d5ee0e536b6a8efb6ae941cbd8f14b6cf886[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Thu Mar 26 22:54:52 2026 -0300
+
+    Corrigindo dependencias no frontend
+
+[33mcommit c1a6e743df131e5d8de4a9634f049fa9f859a25f[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Wed Mar 25 18:08:25 2026 -0300
+
+    ajustes nos settings.py
+
+[33mcommit ca175f024ab634e92734c0ba9e180345607e062b[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Wed Mar 25 17:54:57 2026 -0300
+
+    Adicionando Gunicorn ao requirements.txt
+
+[33mcommit 8100cf313ca8f520486a5192dcc241dea9c45ce5[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Wed Mar 25 17:46:35 2026 -0300
+
+    detalhes para deploy de back
+
+[33mcommit 31d56457eff8cb8174a4711b3e3ca7b09a229dc0[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Wed Mar 25 17:05:46 2026 -0300
+
+    Remove .env do git
+
+[33mcommit 3f6a8b8b4572bfe5eaa146eb5e4596e871e0fc2a[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Wed Mar 25 16:57:07 2026 -0300
+
+    toques finais para mobile (ainda falta bastante coisa
+
+[33mcommit c429f77dccd35344af4c45df7e5c6341adb28aa3[m
+Author: Bianca Peixoto <biancapeixoto@Biancas-MacBook-Air-3.local>
+Date:   Mon Mar 9 18:29:17 2026 -0300
+
+    Atualiza layout Home e adiciona personagem no Questionário
+
+[33mcommit 3e3fe695de3706977c6e1b2f010afbf5ec1eb945[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Mon Mar 9 09:45:41 2026 -0300
+
+    Design frontend questionario para conversar com as outras paginas
+
+[33mcommit 1ceb35e8d4a7c3a9b91fa22471e81e3dfc949f33[m
+Author: Grazii03 <grazielerodrigues2005@gmail.com>
+Date:   Fri Mar 6 23:21:55 2026 -0300
+
+    Ajusta fluxo do questionário e atualização de XP
+
+[33mcommit 0d75bdf6a575399f38ea995951f83da3381135ba[m
+Author: Grazii03 <grazielerodrigues2005@gmail.com>
+Date:   Thu Mar 5 23:35:45 2026 -0300
+
+    Front das  perguntas do questionário infantil
+
+[33mcommit b0b01e6f2bec9d602b79647e4399b447764eb105[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Thu Mar 5 13:57:12 2026 -0300
+
+    tirei o .env do gitignore
+
+[33mcommit d326dd5ccd6fb7d227bdddec62d6e6c57975a2d6[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Thu Mar 5 10:07:24 2026 -0300
+
+    requirements.txt
+
+[33mcommit e0ddba9e0ff4c811ba1999175ee395bd375d5471[m
+Author: Bianca Peixoto <biancapeixoto@Biancas-MacBook-Air-3.local>
+Date:   Thu Feb 26 21:57:31 2026 -0300
+
+    ajustes de layout e estilos
+
+[33mcommit 3d4ac512df058e623d3f3faae4ebdacc64abd9cc[m
+Author: Bianca Peixoto <biancapeixoto@Biancas-MacBook-Air-3.local>
+Date:   Thu Feb 26 10:02:18 2026 -0300
+
+    Resolve conflitos
+
+[33mcommit 3326b4404ebce33775b9a547a8995e413ec75d17[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Thu Feb 26 18:33:30 2026 -0300
+
+    Configuração limpa, banco de dados Neon e gitignore corrigido
+
+[33mcommit 943e4f008caf038045417e8aff35a67671eac93d[m
+Author: Grazii03 <grazielerodrigues2005@gmail.com>
+Date:   Thu Feb 26 09:53:27 2026 -0300
+
+    Backend: ajustes em accounts/questions e migrations
+
+[33mcommit 8177f012f55037111732f8a2a4861ff0bdb7de44[m
+Author: Grazii03 <grazielerodrigues2005@gmail.com>
+Date:   Tue Feb 24 21:16:05 2026 -0300
+
+    Ignorando a pasta router no .gitignore
+
+[33mcommit a2b85242683e3e9638e7079dd85f2fb4a79a73ff[m
+Author: Grazii03 <grazielerodrigues2005@gmail.com>
+Date:   Tue Feb 24 21:02:52 2026 -0300
+
+    Adicionando mudanças locais e removendo .venv
+
+[33mcommit d8fb115138f40cf236564dd5cae86242e6ec6799[m
+Author: Grazii03 <grazielerodrigues2005@gmail.com>
+Date:   Tue Feb 24 20:40:33 2026 -0300
+
+    Adicionando mudanças no código e novo arquivo serializers
+
+[33mcommit 7743ee85e3f2ebb6c009a5cde871a52742338f7b[m
+Author: Bianca Peixoto <biancapeixoto@Biancas-MacBook-Air-3.local>
+Date:   Wed Feb 25 20:10:57 2026 -0300
+
+    página de carregamento + home (até agora) + novas imagens no assets + mudanças do public e no private layout
+
+[33mcommit a6bd062603091e59dcfdf16a549ac978d7819fcc[m
+Author: Bianca Peixoto <biancapeixoto@Biancas-MacBook-Air-3.local>
+Date:   Tue Feb 24 21:11:29 2026 -0300
+
+    Resolver conflitos após o pull
+
+[33mcommit f48f044683603aa15c615a4b83f7a0a639806c82[m
+Author: Bianca Peixoto <biancapeixoto@Biancas-MacBook-Air-3.local>
+Date:   Tue Feb 24 20:09:18 2026 -0300
+
+    Login + Register
+
+[33mcommit 5b1719416707f10a7fdd41ceea7ecf3ca6cf744c[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Tue Feb 24 18:38:49 2026 -0300
+
+    criação da página de personagens, inicio de decoração de página de perfil e de jogos e mudança na lógica de desbloquear personagens
+
+[33mcommit 66e6676893715bad0f333173b6bd7f8435023b4d[m
+Author: Julia Balarin Graziani <juh.b.graziani@gmail.com>
+Date:   Mon Feb 23 09:32:26 2026 -0300
+
+    personagens para decoração do app (estão den
